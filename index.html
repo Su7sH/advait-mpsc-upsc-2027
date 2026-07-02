@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ECEFEA">
+<title>Advait · MPSC + UPSC 2027 Command Center</title>
+<style>
+  :root{
+    --paper:#ECEFEA; --surface:#F7F8F5; --surface-2:#FFFFFF;
+    --ink:#19211C; --ink-soft:#5C655D; --ink-faint:#929B92;
+    --line:#DBE0D9; --line-soft:#E7EBE5;
+    --accent:#B96B2E; --accent-deep:#9A551F; --accent-soft:#F2E4D5; --accent-tint:#FAF3EB;
+    --done:#4B7A68; --done-soft:#E2EDE7;
+    --gov:#3A2E1E; --gov-deep:#241B10; --gov-gold:#9C7B3F; --gov-gold-soft:#EFE6D2; --gov-paper:#FBF8F1;
+    --p1:#C98A4E; --p2:#B96B2E; --p3:#4B7A68; --p4:#2E5246;
+    --learn:#C28A3C; --learn-soft:#F4E8D5; --revise:#5E83C4; --revise-soft:#E2E9F5;
+    --shadow:0 1px 2px rgba(25,33,28,.04), 0 6px 20px rgba(25,33,28,.05);
+    --shadow-lift:0 2px 6px rgba(25,33,28,.07), 0 14px 40px rgba(25,33,28,.10);
+    --r:16px; --r-sm:11px;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Roboto Mono",monospace;
+    --serif:Georgia,"Iowan Old Style","Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.5;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+    padding-bottom:calc(76px + env(safe-area-inset-bottom));}
+  .wrap{max-width:640px;margin:0 auto;}
+
+  .topbar{position:sticky;top:0;z-index:40;background:rgba(236,239,234,.86);
+    backdrop-filter:saturate(140%) blur(14px);-webkit-backdrop-filter:saturate(140%) blur(14px);
+    border-bottom:1px solid var(--line-soft);padding:calc(10px + env(safe-area-inset-top)) 18px 10px;}
+  .topbar-row{display:flex;align-items:center;gap:10px;max-width:640px;margin:0 auto;}
+  .brand{font-family:var(--serif);font-weight:600;font-size:16px;letter-spacing:.2px;flex:1;}
+  .brand span{color:var(--accent);}
+  input[type="date"]{font-family:var(--mono);font-size:12.5px;color:var(--ink);background:var(--surface-2);
+    border:1px solid var(--line);border-radius:999px;padding:7px 12px;appearance:none;min-height:34px;}
+  .btn-today{font-family:var(--sans);font-size:12.5px;font-weight:600;background:var(--ink);color:#fff;
+    border:none;border-radius:999px;padding:8px 14px;min-height:34px;cursor:pointer;letter-spacing:.2px;}
+  .btn-today:active{transform:scale(.96);}
+
+  main{padding:18px 18px 28px;}
+  .view{animation:fade .32s ease both;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  .eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);}
+  h1.day{font-family:var(--serif);font-weight:600;font-size:29px;line-height:1.12;margin:6px 0 0;letter-spacing:.1px;}
+  .section-title{font-family:var(--serif);font-weight:600;font-size:19px;margin:26px 0 12px;display:flex;align-items:baseline;gap:9px;}
+  .section-title .num{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:500;}
+
+  .journey{margin-top:16px;}
+  .journey-track{height:9px;border-radius:999px;background:var(--line-soft);display:flex;overflow:hidden;position:relative;}
+  .journey-seg{height:100%;opacity:.9;}
+  .journey-marker{position:absolute;top:50%;width:15px;height:15px;border-radius:50%;background:#fff;
+    border:3px solid var(--ink);transform:translate(-50%,-50%);box-shadow:0 1px 4px rgba(0,0,0,.18);z-index:2;transition:left .5s ease;}
+  .journey-meta{display:flex;justify-content:space-between;margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--ink-faint);}
+  .journey-label{margin-top:10px;font-size:13px;color:var(--ink-soft);}
+  .journey-label b{color:var(--ink);font-weight:600;}
+
+  .card{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);}
+  .card + .card{margin-top:12px;}
+  .focus{background:var(--accent-tint);border:1px solid var(--accent-soft);}
+  .focus .eyebrow{color:var(--accent-deep);}
+  .focus-item{display:flex;gap:10px;padding:7px 0;border-top:1px dashed var(--accent-soft);}
+  .focus-item:first-of-type{border-top:none;}
+  .focus-tag{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-deep);min-width:74px;padding-top:2px;}
+  .focus-text{font-size:14.5px;color:var(--ink);font-weight:500;}
+  .ring-row{display:flex;align-items:center;gap:14px;margin-top:14px;}
+  .ring{width:54px;height:54px;flex:none;}
+  .ring-txt{font-family:var(--mono);font-size:13px;font-weight:600;}
+  .ring-sub{font-size:12.5px;color:var(--ink-soft);}
+
+  .day-note{font-size:12.5px;color:var(--ink-soft);margin:18px 0 10px;display:flex;align-items:center;gap:7px;}
+  .day-note .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none;}
+  .blocks{display:flex;flex-direction:column;gap:7px;}
+  .blk{display:flex;align-items:stretch;background:var(--surface);border:1px solid var(--line-soft);
+    border-radius:var(--r-sm);overflow:hidden;box-shadow:var(--shadow);transition:opacity .2s;}
+  .blk-bar{width:4px;flex:none;background:var(--ink-faint);}
+  .blk-time{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);width:50px;flex:none;padding:12px 0 0 11px;font-weight:500;}
+  .blk-body{flex:1;padding:11px 8px 11px 10px;min-width:0;}
+  .blk-title{font-size:14px;font-weight:600;line-height:1.25;}
+  .blk-sub{font-size:12px;color:var(--ink-soft);margin-top:2px;line-height:1.3;}
+  .blk-cat{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+    margin-top:6px;padding:2px 7px;border-radius:6px;background:var(--line-soft);color:var(--ink-soft);}
+  .blk-check{width:46px;flex:none;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--line-soft);cursor:pointer;}
+  .checkbox{width:23px;height:23px;border-radius:7px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;transition:all .18s;background:var(--surface-2);}
+  .checkbox svg{width:13px;height:13px;opacity:0;transform:scale(.5);transition:all .18s;color:#fff;}
+  .blk.rest{opacity:.62;box-shadow:none;background:transparent;border-style:dashed;}
+  .blk.rest .blk-title{font-weight:500;}
+  .t-heavy .blk-bar{background:var(--accent);}.t-heavy .blk-cat{background:var(--accent-soft);color:var(--accent-deep);}
+  .t-fixed .blk-bar{background:var(--ink);}.t-fixed .blk-cat{background:#E4E7E1;color:var(--ink);}
+  .t-practice .blk-bar{background:var(--accent-deep);}.t-practice .blk-cat{background:var(--accent-soft);color:var(--accent-deep);}
+  .t-test .blk-bar,.t-sim .blk-bar{background:var(--accent-deep);}
+  .t-test,.t-sim{background:var(--accent-tint);border-color:var(--accent-soft);}
+  .t-test .blk-cat,.t-sim .blk-cat{background:var(--accent);color:#fff;}
+  .t-light .blk-bar{background:var(--ink-faint);}
+  .t-recall .blk-bar{background:var(--done);}.t-recall .blk-cat{background:var(--done-soft);color:var(--done);}
+  .t-gym .blk-bar{background:#8FA68C;}.t-gym .blk-cat{background:#E6EDE3;color:#5E7458;}
+  .blk.done{background:var(--done-soft);border-color:#CFE0D7;}
+  .blk.done .blk-title{color:var(--done);}.blk.done .blk-bar{background:var(--done);}
+  .blk.done .checkbox{background:var(--done);border-color:var(--done);}
+  .blk.done .checkbox svg{opacity:1;transform:scale(1);}
+
+  .state-card{text-align:center;padding:34px 22px;}
+  .state-card .big{font-family:var(--mono);font-size:46px;font-weight:600;color:var(--accent);line-height:1;margin:14px 0 4px;}
+  .state-card .lead{font-family:var(--serif);font-size:22px;font-weight:600;margin-bottom:8px;}
+  .state-card p{font-size:14px;color:var(--ink-soft);max-width:380px;margin:8px auto;}
+  .pill-btn{display:inline-block;margin-top:14px;font-size:13.5px;font-weight:600;background:var(--ink);color:#fff;
+    border:none;border-radius:999px;padding:11px 20px;cursor:pointer;}
+  .pill-btn:active{transform:scale(.97);}
+
+  .month-head{display:flex;align-items:flex-start;gap:12px;}
+  .month-head .mh-main{flex:1;}
+  .phase-badge{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px;color:#fff;white-space:nowrap;}
+  .theme{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--ink-soft);margin-top:4px;}
+  .checkpoint{background:var(--surface);border:1px solid var(--line-soft);border-left:4px solid var(--accent);
+    border-radius:var(--r-sm);padding:13px 15px;margin-top:16px;box-shadow:var(--shadow);}
+  .checkpoint .eyebrow{color:var(--accent-deep);}
+  .checkpoint .cp-text{font-size:14px;font-weight:600;margin-top:5px;line-height:1.35;}
+  .subjects{font-size:13.5px;color:var(--ink-soft);margin-top:13px;line-height:1.5;}
+  .subjects b{color:var(--ink);font-weight:600;}
+  .week{border:1px solid var(--line-soft);border-radius:var(--r-sm);margin-top:9px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow);}
+  .week-hd{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;}
+  .week-hd .wk-label{font-weight:600;font-size:13.5px;flex:1;}
+  .week-hd .wk-dates{font-family:var(--mono);font-size:11px;color:var(--ink-faint);}
+  .week-hd .chev{width:9px;height:9px;border-right:2px solid var(--ink-faint);border-bottom:2px solid var(--ink-faint);transform:rotate(45deg);transition:transform .25s;flex:none;}
+  .week.open .chev{transform:rotate(-135deg);}
+  .week.now .week-hd{background:var(--accent-tint);}
+  .week.now .wk-label::after{content:"NOW";font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.08em;color:#fff;background:var(--accent);padding:2px 6px;border-radius:5px;margin-left:8px;vertical-align:middle;}
+  .week-body{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+  .week.open .week-body{max-height:520px;}
+  .week-inner{padding:2px 14px 14px;border-top:1px solid var(--line-soft);}
+  .wk-row{display:flex;gap:9px;padding:8px 0;border-bottom:1px dashed var(--line-soft);}
+  .wk-row:last-child{border-bottom:none;}
+  .wk-tag{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);min-width:72px;padding-top:2px;}
+  .wk-val{font-size:13px;color:var(--ink);flex:1;}
+  .wk-special{background:var(--accent-tint);border:1px dashed var(--accent-soft);border-radius:8px;padding:7px 10px;margin-top:9px;font-size:12.5px;color:var(--accent-deep);font-weight:500;}
+
+  .check-item{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line-soft);cursor:pointer;}
+  .check-item:last-child{border-bottom:none;}
+  .ci-box{width:21px;height:21px;border-radius:6px;border:2px solid var(--line);flex:none;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .18s;background:var(--surface-2);}
+  .ci-box svg{width:12px;height:12px;opacity:0;color:#fff;transition:opacity .18s;}
+  .check-item.done .ci-box{background:var(--done);border-color:var(--done);}
+  .check-item.done .ci-box svg{opacity:1;}
+  .check-item.done .ci-text{color:var(--ink-faint);text-decoration:line-through;}
+  .ci-text{font-size:13.5px;line-height:1.4;}
+
+  .countdown-card{text-align:center;background:var(--ink);color:#fff;border-radius:var(--r);padding:22px;box-shadow:var(--shadow-lift);}
+  .countdown-card .cd-num{font-family:var(--mono);font-size:52px;font-weight:600;line-height:1;color:#fff;}
+  .countdown-card .cd-num small{font-size:18px;color:var(--accent);}
+  .countdown-card .cd-label{font-size:12.5px;color:#C7CDC6;letter-spacing:.05em;margin-top:6px;text-transform:uppercase;}
+  .countdown-card .cd-date{font-family:var(--mono);font-size:12px;color:#9AA29A;margin-top:9px;}
+  .phase-card{display:flex;gap:13px;padding:14px 15px;border:1px solid var(--line-soft);border-radius:var(--r-sm);background:var(--surface);margin-top:9px;box-shadow:var(--shadow);}
+  .phase-dot{width:13px;height:13px;border-radius:50%;flex:none;margin-top:3px;}
+  .phase-card .pc-main{flex:1;}
+  .phase-card .pc-name{font-weight:600;font-size:14px;}
+  .phase-card .pc-dates{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:1px;}
+  .phase-card .pc-job{font-size:12.5px;color:var(--ink-soft);margin-top:6px;line-height:1.4;}
+  .phase-card .pc-cp{font-size:11.5px;color:var(--accent-deep);margin-top:6px;font-weight:500;}
+  .phase-status{font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 8px;border-radius:6px;height:fit-content;}
+  .ps-done{background:var(--done-soft);color:var(--done);}.ps-now{background:var(--accent);color:#fff;}.ps-next{background:var(--line-soft);color:var(--ink-faint);}
+  .acc{border:1px solid var(--line-soft);border-radius:var(--r-sm);margin-top:9px;background:var(--surface);overflow:hidden;box-shadow:var(--shadow);}
+  .acc-hd{display:flex;align-items:center;gap:10px;padding:14px 15px;cursor:pointer;}
+  .acc-hd .ah-title{font-weight:600;font-size:14px;flex:1;}
+  .acc-hd .chev{width:9px;height:9px;border-right:2px solid var(--ink-faint);border-bottom:2px solid var(--ink-faint);transform:rotate(45deg);transition:transform .25s;flex:none;}
+  .acc.open .chev{transform:rotate(-135deg);}
+  .acc-body{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+  .acc.open .acc-body{max-height:1600px;}
+  .acc-inner{padding:0 15px 15px;border-top:1px solid var(--line-soft);}
+  .acc-inner ol,.acc-inner ul{margin:12px 0 0;padding-left:20px;}
+  .acc-inner li{font-size:13px;color:var(--ink-soft);margin-bottom:9px;line-height:1.45;}
+  .acc-inner li b{color:var(--ink);}
+  .mini-clock{display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line-soft);}
+  .mini-clock:last-child{border-bottom:none;}
+  .mc-time{font-family:var(--mono);font-size:11px;color:var(--ink-soft);width:48px;flex:none;padding-top:1px;}
+  .mc-txt{font-size:12.5px;flex:1;}.mc-txt b{font-weight:600;}.mc-txt span{color:var(--ink-faint);font-size:11.5px;}
+  .mock-form{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+  .mock-form input{font-family:var(--sans);font-size:13px;border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:var(--surface-2);color:var(--ink);}
+  .mock-form input.mf-name{flex:1;min-width:130px;}.mock-form input.mf-score{width:84px;}
+  .mock-form button{font-size:13px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 16px;cursor:pointer;}
+  .mock-list{margin-top:12px;}
+  .mock-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line-soft);}
+  .mock-row .mr-date{font-family:var(--mono);font-size:11px;color:var(--ink-faint);width:64px;flex:none;}
+  .mock-row .mr-name{flex:1;font-size:13px;}
+  .mock-row .mr-score{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent-deep);}
+  .mock-row .mr-del{color:var(--ink-faint);cursor:pointer;font-size:16px;line-height:1;padding:0 4px;}
+  .empty{font-size:12.5px;color:var(--ink-faint);text-align:center;padding:16px;font-style:italic;}
+  .footnote{font-size:11.5px;color:var(--ink-faint);line-height:1.5;margin-top:18px;padding:14px;border-top:1px solid var(--line-soft);}
+  .reset-btn{margin-top:12px;font-size:12px;color:var(--ink-faint);background:none;border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;}
+
+  /* ---------- SYLLABUS (gazette) ---------- */
+  .gz-head{background:linear-gradient(180deg,var(--gov) 0%,var(--gov-deep) 100%);color:var(--gov-paper);
+    border-radius:var(--r);padding:24px 20px 20px;text-align:center;position:relative;box-shadow:var(--shadow-lift);
+    border:1px solid var(--gov-deep);}
+  .gz-seal{width:60px;height:60px;margin:0 auto 12px;display:block;}
+  .gz-emblem{font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gov-gold);font-weight:700;}
+  .gz-title{font-family:var(--serif);font-size:23px;font-weight:600;line-height:1.18;margin:8px 0 4px;color:#fff;}
+  .gz-sub{font-size:11.5px;color:#D8CDB4;letter-spacing:.04em;line-height:1.5;}
+  .gz-rule{width:54px;height:2px;background:var(--gov-gold);margin:14px auto 0;border-radius:2px;}
+  .gz-foot{font-size:10px;color:#B7A988;margin-top:12px;letter-spacing:.03em;}
+
+  .meter{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);margin-top:12px;}
+  .meter-top{display:flex;justify-content:space-between;align-items:baseline;}
+  .meter-top .mt-l{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);}
+  .meter-top .mt-r{font-family:var(--mono);font-size:12px;color:var(--ink-faint);}
+  .meter-bar{height:10px;border-radius:999px;background:var(--line-soft);display:flex;overflow:hidden;margin-top:10px;}
+  .meter-seg{height:100%;}
+  .meter-seg.s-confident{background:var(--done);}
+  .meter-seg.s-revised{background:var(--revise);}
+  .meter-seg.s-learning{background:var(--learn);}
+  .meter-legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:12px;}
+  .lg{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-soft);}
+  .lg .sw{width:10px;height:10px;border-radius:3px;flex:none;}
+
+  .syl-sec{margin-top:22px;}
+  .syl-sec-hd{display:flex;align-items:center;gap:9px;font-family:var(--serif);font-size:18px;font-weight:600;margin-bottom:4px;}
+  .syl-sec-tag{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:var(--gov-gold-soft);color:var(--gov-gold);}
+  .syl-sec-note{font-size:12px;color:var(--ink-faint);margin-bottom:10px;line-height:1.4;}
+
+  .tile{border:1px solid var(--line-soft);border-radius:var(--r-sm);background:var(--surface);margin-top:10px;overflow:hidden;box-shadow:var(--shadow);}
+  .tile-hd{display:flex;align-items:flex-start;gap:11px;padding:14px;cursor:pointer;}
+  .tile-code{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent-deep);background:var(--accent-tint);border:1px solid var(--accent-soft);border-radius:7px;padding:3px 7px;flex:none;margin-top:1px;}
+  .tile-main{flex:1;min-width:0;}
+  .tile-name{font-weight:600;font-size:14px;line-height:1.3;}
+  .tile-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center;}
+  .owner{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:6px;}
+  .owner.vision{background:#E4E7E1;color:var(--ink);}
+  .owner.self{background:var(--accent-soft);color:var(--accent-deep);}
+  .when{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);}
+  .phase2{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--revise);background:var(--revise-soft);padding:3px 8px;border-radius:6px;}
+  .tile-status{flex:none;align-self:center;}
+  .stbtn{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border:none;border-radius:7px;padding:7px 9px;cursor:pointer;white-space:nowrap;min-width:78px;text-align:center;}
+  .st-none{background:var(--line-soft);color:var(--ink-faint);}
+  .st-learning{background:var(--learn-soft);color:var(--learn);}
+  .st-revised{background:var(--revise-soft);color:var(--revise);}
+  .st-confident{background:var(--done-soft);color:var(--done);}
+  .tile-body{max-height:0;overflow:hidden;transition:max-height .32s ease;}
+  .tile.open .tile-body{max-height:900px;}
+  .tile-inner{padding:0 14px 14px;border-top:1px solid var(--line-soft);}
+  .tile-inner .official{font-size:12.5px;color:var(--ink-soft);line-height:1.55;margin-top:12px;}
+  .tile-inner .official b{color:var(--ink);font-weight:600;}
+  .tile-inner ul{margin:8px 0 0;padding-left:18px;}
+  .tile-inner li{font-size:12.5px;color:var(--ink-soft);line-height:1.5;margin-bottom:6px;}
+  .tile-jump{margin-top:12px;font-size:11.5px;font-weight:600;color:var(--accent-deep);background:var(--accent-tint);
+    border:1px solid var(--accent-soft);border-radius:8px;padding:8px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+
+  .nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(247,248,245,.92);
+    backdrop-filter:saturate(140%) blur(16px);-webkit-backdrop-filter:saturate(140%) blur(16px);
+    border-top:1px solid var(--line);display:flex;padding:8px 6px calc(8px + env(safe-area-inset-bottom));}
+  .nav-btn{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0;cursor:pointer;color:var(--ink-faint);font-family:var(--sans);}
+  .nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .nav-btn .nb-label{font-size:10px;font-weight:600;letter-spacing:.01em;}
+  .nav-btn.active{color:var(--accent);}
+
+  @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important;}}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px;}
+
+  /* ---------- V3 · COMMAND CENTER ---------- */
+  :root{
+    --night:#10251E; --night-2:#173329; --lime:#D7E7A8; --signal:#E98042;
+    --blue:#4F78A8; --blue-soft:#E3EBF3; --violet:#735D8C; --violet-soft:#ECE7F1;
+  }
+  body{background:
+    radial-gradient(circle at 10% -10%,rgba(215,231,168,.26),transparent 30rem),
+    linear-gradient(180deg,#E9EDE5 0,#F2F3EF 38rem,#ECEFEA 100%);
+    min-height:100vh;}
+  .wrap{max-width:720px;}
+  .topbar{background:rgba(16,37,30,.94);border-bottom:1px solid rgba(255,255,255,.08);color:#fff;padding-top:calc(11px + env(safe-area-inset-top));}
+  .topbar-row{max-width:720px;}
+  .brand{font-family:var(--sans);font-size:14px;font-weight:760;letter-spacing:-.01em;display:flex;align-items:center;gap:9px;}
+  .brand::before{content:"A";display:grid;place-items:center;width:27px;height:27px;border-radius:9px;background:var(--signal);color:#fff;font-family:var(--serif);font-size:15px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22);}
+  .brand span{color:var(--lime);font-weight:600;}
+  input[type="date"]{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:#fff;color-scheme:dark;padding-inline:10px;}
+  .btn-today{background:var(--lime);color:var(--night);padding-inline:12px;}
+  main{padding:20px 16px 34px;}
+  .eyebrow{color:#6F7B72;}
+  h1.day{font-size:31px;letter-spacing:-.025em;}
+  .card{background:rgba(255,255,255,.72);border-color:rgba(39,58,47,.08);box-shadow:0 1px 2px rgba(16,37,30,.04),0 12px 35px rgba(16,37,30,.045);}
+
+  .command-hero{position:relative;overflow:hidden;border-radius:24px;padding:21px;background:
+    radial-gradient(circle at 90% 0,rgba(215,231,168,.19),transparent 45%),
+    linear-gradient(145deg,var(--night),var(--night-2));color:#fff;box-shadow:0 18px 48px rgba(16,37,30,.22);}
+  .command-hero::after{content:"";position:absolute;width:150px;height:150px;border:1px solid rgba(215,231,168,.16);border-radius:50%;right:-70px;bottom:-86px;box-shadow:0 0 0 22px rgba(215,231,168,.035),0 0 0 44px rgba(215,231,168,.025);}
+  .hero-top{display:flex;gap:14px;align-items:flex-start;position:relative;z-index:1;}
+  .hero-copy{flex:1;min-width:0;}
+  .hero-kicker{font-size:10px;text-transform:uppercase;letter-spacing:.17em;color:var(--lime);font-weight:800;}
+  .hero-title{font-family:var(--serif);font-size:25px;line-height:1.1;margin-top:7px;letter-spacing:-.015em;}
+  .hero-sub{font-size:12px;color:#B7C6BC;margin-top:7px;line-height:1.45;}
+  .hero-days{text-align:right;flex:none;}
+  .hero-days strong{display:block;font-family:var(--mono);font-size:38px;line-height:.92;letter-spacing:-.06em;}
+  .hero-days span{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:#A9B9AF;}
+  .hero-line{height:1px;background:rgba(255,255,255,.1);margin:17px 0 14px;}
+  .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;position:relative;z-index:1;}
+  .hero-stat{padding:9px 10px;border-radius:11px;background:rgba(255,255,255,.055);}
+  .hero-stat b{display:block;font-family:var(--mono);font-size:15px;color:#fff;}
+  .hero-stat span{display:block;font-size:9px;color:#9FAFA5;text-transform:uppercase;letter-spacing:.08em;margin-top:1px;}
+
+  .mission-card{margin-top:13px;background:linear-gradient(135deg,#FFF7EE,#FFFDFC);border:1px solid #F1DCC8;border-radius:18px;padding:16px;box-shadow:var(--shadow);}
+  .mission-row{display:flex;gap:12px;align-items:flex-start;}
+  .mission-index{width:30px;height:30px;border-radius:10px;background:var(--signal);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-size:12px;font-weight:700;flex:none;}
+  .mission-copy{flex:1;}
+  .mission-copy .label{font-size:9.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#A85827;}
+  .mission-copy .text{font-family:var(--serif);font-size:17px;font-weight:600;line-height:1.25;margin-top:3px;}
+  .mission-copy .why{font-size:11.5px;color:var(--ink-soft);margin-top:4px;}
+
+  .checkin{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-top:13px;padding:14px 15px;border-radius:16px;background:rgba(255,255,255,.67);border:1px solid rgba(39,58,47,.08);}
+  .checkin-title{font-size:13px;font-weight:700;}
+  .checkin-sub{font-size:11px;color:var(--ink-faint);margin-top:2px;}
+  .energy{display:flex;background:#E4E8E1;padding:3px;border-radius:10px;gap:2px;}
+  .energy button{width:33px;height:29px;border:0;border-radius:8px;background:transparent;color:var(--ink-soft);font-size:14px;cursor:pointer;}
+  .energy button.active{background:#fff;color:var(--night);box-shadow:0 2px 7px rgba(16,37,30,.1);}
+  .low-day-note{display:none;margin:10px 0 0;padding:10px 12px;border-radius:11px;background:var(--blue-soft);color:#34597E;font-size:12px;line-height:1.45;}
+  .is-low .low-day-note{display:block;}
+  .ess-card{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:12px 0;box-shadow:var(--shadow);}
+  .ess-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;}
+  .ess-head b{font-size:12.5px;}
+  .ess-head span{font-size:9.5px;color:var(--ink-faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;}
+  .ess-row{display:flex;align-items:center;gap:10px;padding:8px 2px;border-top:1px solid var(--line-soft);cursor:pointer;}
+  .ess-time{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);min-width:40px;}
+  .ess-name{flex:1;font-size:12.5px;}
+  .ess-check{width:18px;height:18px;border:1.5px solid var(--line);border-radius:6px;display:flex;align-items:center;justify-content:center;color:transparent;flex:0 0 18px;}
+  .ess-check svg{width:12px;height:12px;}
+  .ess-row.done .ess-check{background:var(--done);border-color:var(--done);color:#fff;}
+  .ess-row.done .ess-name{color:var(--ink-faint);text-decoration:line-through;}
+  .is-low .blk:not(.keystone):not(.rest){opacity:.34;}
+  .is-low .ess-card{border-color:#E6B98E;}
+  .blk.keystone{border-color:#E6B98E;box-shadow:0 0 0 1px rgba(233,128,66,.1),var(--shadow);}
+  .blk.keystone .blk-title::after{content:"ESSENTIAL";font-size:8px;letter-spacing:.09em;color:#A85827;background:#F9E7D7;padding:2px 5px;border-radius:4px;margin-left:7px;vertical-align:2px;}
+
+  .micro-title{display:flex;align-items:center;justify-content:space-between;margin:22px 1px 10px;}
+  .micro-title h2{font-family:var(--serif);font-size:19px;margin:0;}
+  .micro-title span{font-family:var(--mono);font-size:10px;color:var(--ink-faint);}
+  .day-note{margin-top:0;}
+  .blk{background:rgba(255,255,255,.72);border-radius:13px;}
+  .blk-time{width:54px;}
+  .blk-check{width:50px;}
+  .checkbox{border-radius:50%;}
+
+  .reflection{margin-top:18px;border-radius:18px;background:#fff;border:1px solid var(--line-soft);padding:16px;}
+  .reflection-head{display:flex;align-items:center;justify-content:space-between;}
+  .reflection-head b{font-family:var(--serif);font-size:16px;}
+  .reflection-head span{font-size:10px;color:var(--ink-faint);}
+  .reflection textarea{width:100%;min-height:76px;resize:vertical;margin-top:11px;border:1px solid var(--line);border-radius:11px;padding:11px 12px;font-family:var(--sans);font-size:13px;line-height:1.45;background:#F8F9F6;color:var(--ink);}
+  .reflection-foot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
+  .saved-state{font-size:10.5px;color:var(--done);opacity:0;transition:opacity .2s;}
+  .saved-state.show{opacity:1;}
+  .tiny-btn{border:0;background:var(--night);color:#fff;border-radius:9px;padding:8px 12px;font-size:11px;font-weight:700;cursor:pointer;}
+
+  .dash-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px;}
+  .metric{background:#fff;border:1px solid var(--line-soft);border-radius:16px;padding:14px;min-height:105px;}
+  .metric.wide{grid-column:1/-1;}
+  .metric-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);font-weight:800;}
+  .metric-value{font-family:var(--mono);font-size:27px;font-weight:650;letter-spacing:-.05em;margin-top:7px;}
+  .metric-note{font-size:11px;color:var(--ink-soft);margin-top:3px;line-height:1.35;}
+  .heatmap{display:grid;grid-template-columns:repeat(14,1fr);gap:5px;margin-top:12px;}
+  .heat{aspect-ratio:1;border-radius:5px;background:#E2E6E0;}
+  .heat.h1{background:#C8D8C5}.heat.h2{background:#8FAE99}.heat.h3{background:#4B7A68}.heat.h4{background:var(--night)}
+  .heat-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--ink-faint);margin-top:5px;}
+  .subject-bars{margin-top:11px;display:flex;flex-direction:column;gap:9px;}
+  .sbar-row{display:grid;grid-template-columns:76px 1fr 30px;gap:8px;align-items:center;font-size:11px;}
+  .sbar-track{height:7px;border-radius:99px;background:var(--line-soft);overflow:hidden;}
+  .sbar-fill{height:100%;border-radius:99px;background:var(--signal);}
+  .sbar-num{font-family:var(--mono);font-size:10px;color:var(--ink-faint);text-align:right;}
+  .trend{width:100%;height:80px;margin-top:7px;}
+  .trend-empty{font-size:12px;color:var(--ink-faint);padding:22px 0 8px;text-align:center;}
+  .insight{display:flex;gap:10px;margin-top:10px;padding:11px;border-radius:12px;background:#F6F2E8;color:#6B542C;font-size:11.5px;line-height:1.4;}
+  .insight::before{content:"↗";font-family:var(--mono);font-weight:700;}
+
+  .tool-card{background:#fff;border:1px solid var(--line-soft);border-radius:16px;padding:15px;margin-top:10px;}
+  .tool-card h3{font-size:14px;margin:0;}
+  .tool-card p{font-size:11.5px;color:var(--ink-soft);margin:4px 0 12px;}
+  .tool-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .soft-btn{border:1px solid var(--line);background:#F7F8F5;color:var(--ink);border-radius:9px;padding:9px 12px;font-size:11.5px;font-weight:700;cursor:pointer;}
+  .soft-btn.danger{color:#A94F38;background:#FFF7F5;border-color:#F0D4CC;}
+  .import-label{position:relative;overflow:hidden;}
+  .import-label input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+
+  .nav{background:rgba(250,251,248,.94);padding-inline:4px;}
+  .nav-btn{min-width:0;}
+  .nav-btn .nb-label{font-size:9px;}
+  .nav-btn.active{color:var(--signal);}
+  .nav-btn.active svg{stroke-width:2.2;}
+  .nav-btn[data-view="progress"].active{color:var(--done);}
+
+  @media (max-width:390px){
+    .brand span{display:none;}
+    .hero-title{font-size:22px;}
+    .hero-days strong{font-size:33px;}
+    .hero-stats{gap:5px;}
+    .hero-stat{padding:8px 7px;}
+    .date-pick input{width:124px;}
+  }
+  @media (min-width:640px){
+    main{padding-inline:22px;}
+    .dash-grid{grid-template-columns:repeat(4,1fr);}
+    .metric.wide{grid-column:span 2;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="topbar-row">
+      <div class="brand">Advait <span>· MPSC + UPSC 2027</span></div>
+      <div class="date-pick"><input type="date" id="datePick" min="2026-06-24" max="2027-05-31"></div>
+      <button class="btn-today" id="todayBtn">Today</button>
+    </div>
+  </div>
+  <main>
+    <div id="view-syllabus" class="view" style="display:none"></div>
+    <div id="view-today" class="view"></div>
+    <div id="view-month" class="view" style="display:none"></div>
+    <div id="view-progress" class="view" style="display:none"></div>
+    <div id="view-plan" class="view" style="display:none"></div>
+  </main>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" data-view="today">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>
+    <span class="nb-label">Today</span>
+  </button>
+  <button class="nav-btn" data-view="syllabus">
+    <svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><path d="M15 4v4h4M8 12h8M8 16h6"/></svg>
+    <span class="nb-label">Coverage</span>
+  </button>
+  <button class="nav-btn" data-view="month">
+    <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v3.5M16 3v3.5"/></svg>
+    <span class="nb-label">Roadmap</span>
+  </button>
+  <button class="nav-btn" data-view="progress">
+    <svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3"/><path d="M2 19h20"/></svg>
+    <span class="nb-label">Pulse</span>
+  </button>
+  <button class="nav-btn" data-view="plan">
+    <svg viewBox="0 0 24 24"><path d="M9 4.5 4 6.5v13l5-2 6 2 5-2v-13l-5 2-6-2Z"/><path d="M9 4.5v13M15 6.5v13"/></svg>
+    <span class="nb-label">Plan</span>
+  </button>
+</nav>
+
+<script>
+/* ===== constants ===== */
+const PLAN_START="2026-07-06", EXAM="2027-05-23", MAX_DATE="2027-05-31";
+const CHECK_ICON='<svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+/* ===== store ===== */
+const STORE_KEY="advait_dual_2027_v1";
+let mem=null;
+function loadStore(){try{const r=localStorage.getItem(STORE_KEY);return r?JSON.parse(r):{};}catch(e){return mem||{};}}
+function saveStore(s){mem=s;try{localStorage.setItem(STORE_KEY,JSON.stringify(s));}catch(e){}}
+let store=loadStore();
+store.ticks=store.ticks||{};
+store.review=store.review||{};
+store.mocks=store.mocks||[];
+store.syllabus=store.syllabus||{};
+store.energy=store.energy||{};
+store.notes=store.notes||{};
+
+let currentView="today";
+
+/* ===== date helpers ===== */
+function mkDate(iso){const[y,m,d]=iso.split("-").map(Number);return new Date(y,m-1,d,12,0,0);}
+function isoOf(dt){return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0");}
+function todayISO(){return isoOf(new Date());}
+function clampISO(iso){if(iso<"2026-06-24")return"2026-06-24";if(iso>MAX_DATE)return MAX_DATE;return iso;}
+function daysBetween(a,b){return Math.round((mkDate(b)-mkDate(a))/86400000);}
+const WD=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function fmtLong(iso){const d=mkDate(iso);return WD[d.getDay()]+", "+d.getDate()+" "+MO[d.getMonth()]+" "+d.getFullYear();}
+function fmtShort(iso){const d=mkDate(iso);return d.getDate()+" "+MO[d.getMonth()];}
+function dow(iso){return mkDate(iso).getDay();}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+let selectedISO=clampISO(todayISO());
+
+/* ===== lookups (PHASES/MONTHS/SYLLABUS defined in Step 3) ===== */
+function getPhase(iso){return PHASES.find(p=>iso>=p.start&&iso<=p.end)||null;}
+function getMonth(iso){const key=iso.slice(0,7);return MONTHS.find(m=>m.id===key)||null;}
+function getWeek(m,iso){if(!m)return null;return m.weeks.find(w=>iso>=w.start&&iso<=w.end)||null;}
+
+/* ===== daily clocks (structure fixed; weekly content injected from MONTHS) ===== */
+const TICKABLE=new Set(["heavy","fixed","practice","test","light","recall","gym","sim"]);
+
+const CLOCK_CLASS=[
+  {t:"6:45",title:"Wake & hydrate",type:"wake"},
+  {t:"7:15",title:"Workout + meditation",sub:"The non-negotiable anchor — done before the desk",type:"gym",cat:"Wellbeing"},
+  {t:"8:15",title:"Bath, breakfast & newspaper",sub:"Indian Express / Loksatta — GS-tagged notes",type:"light",cat:"Reading"},
+  {t:"9:00",title:"Sociology — Optional",sub:"Morning peak · 2 hrs daily · counts in BOTH mains",type:"heavy",cat:"Deep work",slot:"socioMorning"},
+  {t:"11:00",title:"GS Block A — Chanakya recorded lecture",sub:"Watch actively, margin notes — 1.25x max",type:"fixed",cat:"Lecture",slot:"gsHeavy"},
+  {t:"13:00",title:"Lunch & rest",type:"meal"},
+  {t:"14:00",title:"Block A consolidation",sub:"Same-day self-study of the lecture subject — notes, NCERT, PYQ tags",type:"heavy",cat:"Deep work"},
+  {t:"15:30",title:"CSAT practice",sub:"Mon/Wed/Fri quant & reasoning · Tue/Thu/Sat comprehension incl. Marathi & English passages (MPSC)",type:"practice",cat:"CSAT"},
+  {t:"16:30",title:"Tea break & walk",type:"break"},
+  {t:"17:00",title:"GS Block B — second subject",sub:"Equal-focus rotation — no GS paper left cold",type:"heavy",cat:"Deep work",slot:"gsSecond"},
+  {t:"19:00",title:"Current affairs",sub:"Daily CA + PIB · Maharashtra CA twice a week (MPSC)",type:"light",cat:"Light · CA"},
+  {t:"20:00",title:"Dinner & family",type:"meal"},
+  {t:"21:00",title:"Answer writing / backlog",sub:"Alternate: GS answers · Sociology answers · pending lectures",type:"heavy",cat:"Deep work",slot:"eveningRotation"},
+  {t:"22:30",title:"Active recall + tracker",sub:"Close the books, self-test, mark carry-forward",type:"recall",cat:"Review"},
+  {t:"23:00",title:"Wind down · sleep",type:"wind"}
+];
+const CLOCK_CLASS_SUN=[
+  {t:"7:30",title:"Wake · light stretch + meditation",sub:"Lighter morning — this is strategy too",type:"wake"},
+  {t:"8:30",title:"Breakfast & newspaper",type:"light",cat:"Reading"},
+  {t:"9:00",title:"Weekly test",sub:"The week's topics — MCQs + one descriptive answer",type:"test",cat:"Test"},
+  {t:"11:00",title:"Test review",sub:"Every wrong & guessed answer goes into the error log",type:"recall",cat:"Review"},
+  {t:"13:00",title:"Lunch & rest",type:"meal"},
+  {t:"14:00",title:"Cumulative revision — the week",sub:"From recall notes · both GS subjects + Sociology",type:"heavy",cat:"Deep work"},
+  {t:"16:00",title:"CA consolidation — the week",type:"light",cat:"Light · CA"},
+  {t:"17:00",title:"Off — rest, walk, family",sub:"Protect this as fiercely as study",type:"break"}
+];
+const CLOCK_PRELIMS=[
+  {t:"6:45",title:"Wake & hydrate",type:"wake"},
+  {t:"7:15",title:"Workout + meditation",type:"gym",cat:"Wellbeing"},
+  {t:"8:15",title:"Breakfast & newspaper",type:"light",cat:"Reading"},
+  {t:"9:00",title:"Static revision",sub:"Rolling subject cycle",type:"heavy",cat:"Revision",slot:"revisionCycle"},
+  {t:"11:00",title:"MCQs + PYQs — subject of the day",sub:"UPSC + MPSC PYQs together — same syllabus, two question styles",type:"heavy",cat:"Deep work",slot:"gsHeavy"},
+  {t:"13:00",title:"Lunch & rest",type:"meal"},
+  {t:"14:00",title:"Full / sectional mock",sub:"Exam-style timing · alternate UPSC & MPSC pattern",type:"test",cat:"Mock",slot:"mock"},
+  {t:"16:00",title:"Tea break & walk",type:"break"},
+  {t:"16:30",title:"Mock review",sub:"Review > attempt — analyse every wrong & guessed answer",type:"recall",cat:"Review"},
+  {t:"18:30",title:"CSAT — daily, non-negotiable",sub:"Incl. Marathi/English passages for MPSC Paper II",type:"practice",cat:"CSAT"},
+  {t:"19:30",title:"Dinner & family",type:"meal"},
+  {t:"20:30",title:"Sociology — keep warm",sub:"45 min so the Mains base doesn't decay",type:"heavy",cat:"Deep work"},
+  {t:"21:15",title:"Weak-area MCQs / CA revision",type:"light",cat:"Light · CA"},
+  {t:"22:15",title:"Recall + tracker",type:"recall",cat:"Review"},
+  {t:"23:00",title:"Wind down",type:"wind"}
+];
+const CLOCK_PRELIMS_SUN=[
+  {t:"7:30",title:"Slow start · meditation",sub:"Lighter Sunday",type:"wake"},
+  {t:"8:30",title:"Newspaper + CA",type:"light",cat:"Reading"},
+  {t:"9:30",title:"Cumulative revision",sub:"Weak topics from the error log",type:"heavy",cat:"Revision"},
+  {t:"12:30",title:"Lunch & rest",type:"meal"},
+  {t:"14:00",title:"Mock-review backlog / CA compilation",type:"recall",cat:"Review"},
+  {t:"16:00",title:"Off — rest, walk, family",type:"break"},
+  {t:"20:00",title:"Light revision + early sleep",type:"wind"}
+];
+const CLOCK_TAPER=[
+  {t:"6:45",title:"Wake & light walk",type:"wake"},
+  {t:"7:15",title:"Meditation",sub:"Temperament is the final skill",type:"gym",cat:"Wellbeing"},
+  {t:"7:45",title:"Revise from final 1-page sheets",sub:"No new material",type:"heavy",cat:"Revision",slot:"taperRevision"},
+  {t:"9:00",title:"Breakfast & break",type:"break"},
+  {t:"9:30",title:"GS Paper — full simulation",sub:"Real exam timing (9:30–11:30)",type:"sim",cat:"Simulation",slot:"sim"},
+  {t:"11:30",title:"Lunch & rest",type:"meal"},
+  {t:"13:00",title:"GS mock review",type:"recall",cat:"Review"},
+  {t:"14:30",title:"CSAT — full simulation",sub:"Real exam timing (2:30–4:30)",type:"sim",cat:"Simulation"},
+  {t:"16:30",title:"CSAT review + CA revision",type:"light",cat:"Light · CA"},
+  {t:"18:00",title:"Walk + dinner",type:"meal"},
+  {t:"19:30",title:"Light revision",sub:"From final sheets only",type:"light",cat:"Revision"},
+  {t:"21:00",title:"Recall + calm",type:"recall",cat:"Review"},
+  {t:"21:30",title:"Early sleep",type:"wind"}
+];
+
+
+/* ===== phases & checkpoints ===== */
+const PHASES=[
+  {id:"p1",name:"Build",dates:"6 Jul – 31 Oct 2026",start:"2026-07-06",end:"2026-10-31",color:"var(--p1)",
+   job:"Equal-rotation GS foundation — two subjects in parallel (Chanakya lectures + self-study) · Sociology daily 9–11 from day one · CSAT daily · Sunday weekly tests · answer writing from week 3.",
+   cp:"31 Oct — Polity, History (incl. Marathas), Economy, Geography, Environment, Governance & the Maharashtra socio-cultural layer done · Sociology Paper 1 complete"},
+  {id:"p2",name:"GS completion + Mains layer",dates:"1 Nov – 31 Dec 2026",start:"2026-11-01",end:"2026-12-31",color:"var(--p2)",
+   job:"Finish GS — S&T, World History, IR, Internal Security, Ethics · Sociology Paper 2 done · Maharashtra economy + MPSC PYQ scan · first static revision begins.",
+   cp:"31 Dec — entire GS + Sociology covered once, clean notes for all"},
+  {id:"p3",name:"Prelims intensive",dates:"1 Jan – 30 Apr 2027",start:"2027-01-01",end:"2027-04-30",color:"var(--p3)",
+   job:"MCQs + PYQs (UPSC and MPSC), three static revisions, CSAT daily, CA consolidation, mock ramp alternating UPSC & MPSC pattern.",
+   cp:"30 Apr — 3+ revisions and 20+ full mocks done & reviewed"},
+  {id:"p4",name:"Peak & taper",dates:"1 – 23 May 2027",start:"2027-05-01",end:"2027-05-23",color:"var(--p4)",
+   job:"Full-length simulations at exam timing, final revision, temperament, taper. UPSC Prelims 23 May; MPSC Rajyaseva prelims as per MPSC calendar — same preparation carries straight into it.",
+   cp:"23 May — UPSC Prelims · MPSC Rajyaseva prelims as scheduled"}
+];
+const CHECKPOINTS=[
+  {date:"2026-09-20",label:"Sociology P1 done"},
+  {date:"2026-10-31",label:"Core GS done"},
+  {date:"2026-12-31",label:"All GS + Socio covered"},
+  {date:"2027-05-23",label:"UPSC Prelims"}
+];
+
+/* ===== revised month spine ===== */
+const MONTHS=[
+ {id:"2026-07",name:"July 2026",phase:"p1",theme:"Foundation opens — Polity + Modern History in parallel",
+  subjects:"Sociology <b>Paper 1</b> daily 9–11 (discipline → thinkers) · <b>Polity</b> in Block A (Chanakya lectures + same-day consolidation) · <b>Modern History</b> in Block B · CSAT daily from day one.",
+  checkpoint:{text:"Polity core done · Modern History to 1920 done · Socio P1 units 1–4 done · CSAT + Sunday-test rhythm locked.",date:"31 Jul"},
+  review:["Polity core covered (Constitution → judiciary → federalism → local govt)","Modern History to 1920 covered","Sociology P1 units 1–4 (discipline, science, methods, thinkers begun)","CSAT 1 hr/day habit locked","Sunday test + error log rhythm running"],
+  weeks:[
+   {label:"Week 1",start:"2026-07-06",end:"2026-07-12",socioMorning:"Socio P1 — the discipline: modernity & emergence, scope, sociology vs common sense",gsHeavy:"Polity — historical underpinnings, making of the Constitution, Preamble, salient features",gsSecond:"Modern History — Company rule 1757–1857, Revolt of 1857",special:"Day one 6 Jul — set up notes system + error log · Sunday: light diagnostic test"},
+   {label:"Week 2",start:"2026-07-13",end:"2026-07-19",socioMorning:"Socio P1 — sociology as science: positivism & critique, fact-value, non-positivist methods",gsHeavy:"Polity — Fundamental Rights, DPSP, Fundamental Duties, amendments & basic structure",gsSecond:"Modern History — 1858–1905: INC founding, moderates & extremists",special:"CSAT baseline test this week"},
+   {label:"Week 3",start:"2026-07-20",end:"2026-07-26",socioMorning:"Socio P1 — research methods & analysis: qualitative/quantitative, sampling, hypothesis",gsHeavy:"Polity — Union & State executive; Parliament & State legislatures",gsSecond:"Modern History — 1905–1920: Swadeshi, Home Rule, Gandhi arrives",special:"Answer writing starts — 2/week (1 GS + 1 Socio)"},
+   {label:"Week 4",start:"2026-07-27",end:"2026-07-31",socioMorning:"Socio P1 — thinkers I: Marx (historical materialism, alienation, class struggle), Durkheim (division of labour, social fact, suicide, religion)",gsHeavy:"Polity — judiciary, federalism, centre–state, local govt (73rd/74th)",gsSecond:"Modern History — Non-Cooperation & Civil Disobedience",special:"Month-end: Sunday cumulative test (Polity + Modern History)"}
+ ]},
+ {id:"2026-08",name:"August 2026",phase:"p1",theme:"Economy + the full History timeline (incl. the Marathas)",
+  subjects:"Sociology P1 continues (thinkers → politics & society) · <b>Economy</b> Block A · <b>History</b> Block B — finish Modern, then Ancient & Medieval including the <b>Maratha empire (MPSC weightage)</b>.",
+  checkpoint:{text:"Economy first pass done · full History timeline done incl. Marathas · Socio P1 ~70%.",date:"31 Aug"},
+  review:["Economy first pass complete (NCERT → macro → fiscal → external)","History complete — Modern, Ancient, Medieval + Maratha empire","Socio P1 units 4–7 done","Polity revised once (spaced)"],
+  weeks:[
+   {label:"Week 1",start:"2026-08-01",end:"2026-08-09",socioMorning:"Socio P1 — thinkers II: Weber (social action, ideal types, authority, bureaucracy), Parsons, Merton, Mead",gsHeavy:"Economy — NCERT spine; national income, growth vs development",gsSecond:"Modern History — 1930–47: Quit India, partition, independence; post-independence consolidation",special:"Sunday test: Economy basics + Modern History finish"},
+   {label:"Week 2",start:"2026-08-10",end:"2026-08-16",socioMorning:"Socio P1 — stratification & mobility: concepts, theories, dimensions",gsHeavy:"Economy — money, banking, RBI, inflation",gsSecond:"Ancient India — Indus Valley → Mauryas → Guptas"},
+   {label:"Week 3",start:"2026-08-17",end:"2026-08-23",socioMorning:"Socio P1 — works & economic life: organisation of work across societies",gsHeavy:"Economy — fiscal policy, budget, taxation, GST",gsSecond:"Medieval — Delhi Sultanate, Vijayanagara, Mughals",special:"Sunday test: Economy + Ancient India"},
+   {label:"Week 4",start:"2026-08-24",end:"2026-08-31",socioMorning:"Socio P1 — politics & society: power, authority, state, civil society, social movements",gsHeavy:"Economy — external sector, BoP, trade; planning & sectors",gsSecond:"The Marathas & Maharashtra — Shivaji, the Peshwas, administration & land systems (MPSC core)",special:"Month-end cumulative test (Economy + full History)"}
+ ]},
+ {id:"2026-09",name:"September 2026",phase:"p1",theme:"Geography + Environment (they overlap) · Socio P1 finishes",
+  subjects:"Sociology P1 finishes and P2 opens · <b>Geography</b> Block A (physical → India → Maharashtra) · <b>Environment</b> Block B · map work every evening.",
+  checkpoint:{text:"Geography done incl. Maharashtra · Environment done · ★ Sociology Paper 1 COMPLETE.",date:"30 Sep"},
+  review:["Physical + Indian Geography done, map habit set","Maharashtra geography covered (MPSC)","Environment done & revised once","★ Sociology Paper 1 complete","Economy revised once (spaced)"],
+  weeks:[
+   {label:"Week 1",start:"2026-09-01",end:"2026-09-06",socioMorning:"Socio P1 — religion & society: theories, types of practice, secularisation, revivalism",gsHeavy:"Geography — physical: geomorphology, climatology",gsSecond:"Environment — ecology, biodiversity, conservation, protected areas",special:"Map work every evening this month"},
+   {label:"Week 2",start:"2026-09-07",end:"2026-09-13",socioMorning:"Socio P1 — systems of kinship: family, marriage, descent, patriarchy",gsHeavy:"Geography — physical: oceanography, biogeography",gsSecond:"Environment — climate change, conventions, institutions",special:"Sunday test: physical Geography + Environment"},
+   {label:"Week 3",start:"2026-09-14",end:"2026-09-20",socioMorning:"Socio P1 — social change in modern society · ★ Paper 1 DONE",gsHeavy:"Geography — India: physiography, drainage, monsoon, soils",gsSecond:"Environment — pollution, EIA, acts & policies"},
+   {label:"Week 4",start:"2026-09-21",end:"2026-09-27",socioMorning:"Socio P2 — perspectives: Indology (Ghurye), structural functionalism (Srinivas), Marxist sociology (Desai)",gsHeavy:"Geography — India: resources, agriculture, industry",gsSecond:"Environment — current issues + PYQ blitz",special:"Sunday test: full Geography + Environment"},
+   {label:"Week 5",start:"2026-09-28",end:"2026-09-30",socioMorning:"Socio P2 — impact of colonial rule on Indian society",gsHeavy:"Maharashtra geography — physiography, rivers, agro-climatic zones (MPSC)",gsSecond:"Month-end consolidation",special:"Month revision Sunday"}
+ ]},
+ {id:"2026-10",name:"October 2026",phase:"p1",theme:"Governance & Social Justice + Culture & the Maharashtra layer",
+  subjects:"Socio P2 (social structure) · Block A: <b>Governance & Social Justice</b> · Block B: <b>Art & Culture</b> + Maharashtra's socio-cultural history — <b>Bhakti & the saints, the reformers</b> (named MPSC weightage).",
+  checkpoint:{text:"Governance & Social Justice done · A&C done · Maharashtra socio-cultural layer done · Phase 1 complete.",date:"31 Oct"},
+  review:["Governance, social justice & welfare architecture done","Art & Culture done","Bhakti movement & Maharashtra saints covered (Dnyaneshwar → Tukaram → Ramdas)","Reformers covered — Phule, Shahu, Ambedkar, Karve","★ Phase 1 checkpoint met — core GS + Socio P1 done"],
+  weeks:[
+   {label:"Week 1",start:"2026-10-01",end:"2026-10-04",socioMorning:"Socio P2 — caste system: perspectives (Ghurye, Srinivas, Dumont, Beteille), untouchability",gsHeavy:"Governance — transparency, e-governance, citizens' charters, role of civil services",gsSecond:"A&C — architecture: temple styles, Indo-Islamic, forts of Maharashtra",special:"Sunday test: Sociology Paper 1 full"},
+   {label:"Week 2",start:"2026-10-05",end:"2026-10-11",socioMorning:"Socio P2 — rural & agrarian social structure; land tenure & reforms",gsHeavy:"Social justice — welfare schemes, vulnerable sections, health, education, poverty & hunger",gsSecond:"A&C — painting, music, dance, literature"},
+   {label:"Week 3",start:"2026-10-12",end:"2026-10-18",socioMorning:"Socio P2 — tribal communities: integration & autonomy",gsHeavy:"Constitutional, statutory & quasi-judicial bodies",gsSecond:"Bhakti movement & its philosophy — Maharashtra's saints: Dnyaneshwar, Namdev, Eknath, Tukaram, Ramdas (MPSC GS-1, named topic)",special:"Sunday test: Governance + A&C"},
+   {label:"Week 4",start:"2026-10-19",end:"2026-10-25",socioMorning:"Socio P2 — family, kinship & social classes in India",gsHeavy:"Local self-government — PRI, urban governance; the Maharashtra pattern (MPSC)",gsSecond:"Social reformers of Maharashtra — Phule, Shahu, Ambedkar, Karve, Vitthal Ramji Shinde (MPSC)"},
+   {label:"Week 5",start:"2026-10-26",end:"2026-10-31",socioMorning:"Socio P2 — religion & society; religious minorities",gsHeavy:"Buffer + spaced revision — Polity & Economy",gsSecond:"Maharashtra layer consolidation",special:"★ 31 Oct checkpoint — Phase 1 complete"}
+ ]},
+ {id:"2026-11",name:"November 2026",phase:"p2",theme:"S&T, World History, IR & Internal Security",
+  subjects:"Socio P2 (social change in India) · Block A: <b>Science & Tech</b> → <b>World History</b> · Block B: <b>International Relations</b> → <b>Internal Security</b>.",
+  checkpoint:{text:"S&T, World History, IR & Internal Security done · Socio P2 ~80%.",date:"30 Nov"},
+  review:["S&T covered (space, IT, biotech, defence, IPR)","World History covered","IR + Internal Security covered","Socio P2 through social movements","History + Geography revised once (spaced)"],
+  weeks:[
+   {label:"Week 1",start:"2026-11-01",end:"2026-11-08",socioMorning:"Socio P2 — visions of social change: planning, mixed economy, law & social change",gsHeavy:"S&T — space, IT, computers, everyday science",gsSecond:"IR — India & its neighbourhood",special:"Sunday test: October block"},
+   {label:"Week 2",start:"2026-11-09",end:"2026-11-15",socioMorning:"Socio P2 — rural transformation: development programmes, green revolution, rural labour",gsHeavy:"S&T — biotech, nano, robotics, IPR, achievements of Indians",gsSecond:"IR — groupings, institutions, diaspora"},
+   {label:"Week 3",start:"2026-11-16",end:"2026-11-22",socioMorning:"Socio P2 — industrialisation & urbanisation: working class, informal sector, slums",gsHeavy:"World History — industrial revolution, world wars",gsSecond:"Internal security — extremism, cyber security, money-laundering",special:"Sunday test: S&T + IR"},
+   {label:"Week 4",start:"2026-11-23",end:"2026-11-29",socioMorning:"Socio P2 — politics & society; social movements (peasant, women's, Dalit, environmental)",gsHeavy:"World History — colonisation, decolonisation, political philosophies",gsSecond:"Internal security — border management, organised crime, security forces"},
+   {label:"Week 5",start:"2026-11-30",end:"2026-11-30",socioMorning:"Buffer",gsHeavy:"Buffer / consolidate",gsSecond:"",special:"Buffer day"}
+ ]},
+ {id:"2026-12",name:"December 2026",phase:"p2",theme:"Ethics + close every gap + Revision R1",
+  subjects:"Block A: <b>Ethics</b> (framework → case studies) · Block B: Indian Society (GS-1) → <b>Maharashtra economy + MPSC PYQ scan</b> · Sociology P2 finishes · <b>first static revision begins</b>.",
+  checkpoint:{text:"ENTIRE GS + Sociology covered once · Maharashtra layer complete · revision round 1 begun.",date:"31 Dec"},
+  review:["Ethics framework + case-study method done","★ Sociology BOTH papers complete","Indian Society (GS-1) done","Maharashtra economy + MPSC PYQ scan done","Revision round 1 in motion","CA compilation organised"],
+  weeks:[
+   {label:"Week 1",start:"2026-12-01",end:"2026-12-06",socioMorning:"Socio P2 — population dynamics: growth, policy, emerging issues",gsHeavy:"Ethics — terminology, thinkers, attitude, aptitude & foundational values",gsSecond:"Indian Society — diversity, women, urbanisation, globalisation, secularism",special:"Sunday test: November block"},
+   {label:"Week 2",start:"2026-12-07",end:"2026-12-13",socioMorning:"Socio P2 — challenges of social transformation · ★ Paper 2 DONE",gsHeavy:"Ethics — emotional intelligence, public service values, probity, RTI",gsSecond:"Maharashtra economy — key sectors, HDI, flagship schemes (MPSC)"},
+   {label:"Week 3",start:"2026-12-14",end:"2026-12-20",socioMorning:"Sociology — full revision + answer writing",gsHeavy:"Ethics — case-study practice",gsSecond:"MPSC PYQ scan — map every recent paper to your notes; build the gap list",special:"Sunday test: Ethics + Indian Society"},
+   {label:"Week 4",start:"2026-12-21",end:"2026-12-27",socioMorning:"Sociology — PYQ mapping (UPSC + MPSC optional papers)",gsHeavy:"Static revision R1 — Polity, Economy",gsSecond:"Revision R1 — Environment",special:"Revision round 1 begins"},
+   {label:"Week 5",start:"2026-12-28",end:"2026-12-31",socioMorning:"Sociology — maintenance rhythm set (45 min from Jan)",gsHeavy:"Revision R1 — Geography, History",gsSecond:"Revision R1 — Maharashtra layer",special:"★ 31 Dec checkpoint · year-end full review"}
+ ]},
+ {id:"2027-01",name:"January 2027",phase:"p3",theme:"Pivot to Prelims · Revision R1 finish + mocks begin",
+  subjects:"Prelims mode — <b>MCQs + PYQs (UPSC & MPSC)</b> per subject, finish <b>static revision round 1</b>, <b>CSAT daily</b>, CA consolidation. Sociology kept warm 45 min.",
+  checkpoint:{text:"Static revision R1 complete · CSAT comfortable at 33%+ · weekly full mocks underway.",date:"31 Jan"},
+  review:["Revision round 1 complete","CSAT clearing 33%+ consistently (incl. Marathi/English passages)","4 full mocks done & reviewed","Running weak-topics list maintained"],
+  weeks:[
+   {label:"Week 1",start:"2027-01-01",end:"2027-01-03",revisionCycle:"R1 — Polity + Economy",gsHeavy:"Polity / Economy MCQs",mock:"Set mock schedule (alternate UPSC / MPSC pattern)",special:"Pivot to Prelims · finish Revision R1"},
+   {label:"Week 2",start:"2027-01-04",end:"2027-01-10",revisionCycle:"R1 — Geography + History",gsHeavy:"Geo / History PYQs — UPSC + MPSC",mock:"Full mock #1 (UPSC pattern) + full review"},
+   {label:"Week 3",start:"2027-01-11",end:"2027-01-17",revisionCycle:"R1 — Environment + S&T + Polity-current",gsHeavy:"Env / S&T MCQs",mock:"Mock #2 (MPSC pattern) + review"},
+   {label:"Week 4",start:"2027-01-18",end:"2027-01-24",revisionCycle:"R1 — Economy-current + Governance + Society",gsHeavy:"PYQs",mock:"Mock #3 + review · CSAT sectionals"},
+   {label:"Week 5",start:"2027-01-25",end:"2027-01-31",revisionCycle:"R1 finish + build weak-topic list",gsHeavy:"Weak-topic MCQs",mock:"Mock #4 + review",special:"★ Revision R1 complete"}
+ ]},
+ {id:"2027-02",name:"February 2027",phase:"p3",theme:"Revision R2 + mocks ×2/week",
+  subjects:"<b>Static revision round 2</b> (faster) · <b>2 full mocks/week + thorough review</b>, alternating UPSC & MPSC pattern · PYQs every subject · CSAT sectionals · CA monthly compilations revised.",
+  checkpoint:{text:"Static revision R2 complete · mock scores trending up · all-subject PYQs done.",date:"28 Feb"},
+  review:["Revision round 2 complete","~12 mocks total, all reviewed","Scores rising in both patterns","Weak-topic list shrinking"],
+  weeks:[
+   {label:"Week 1",start:"2027-02-01",end:"2027-02-07",revisionCycle:"R2 — Polity, Economy",gsHeavy:"MCQs + PYQs",mock:"Mocks #5–6 + review"},
+   {label:"Week 2",start:"2027-02-08",end:"2027-02-14",revisionCycle:"R2 — Geography, History (incl. Maharashtra layer)",gsHeavy:"MCQs + PYQs",mock:"Mocks #7–8 + review"},
+   {label:"Week 3",start:"2027-02-15",end:"2027-02-21",revisionCycle:"R2 — Environment, S&T, Governance",gsHeavy:"MCQs + PYQs",mock:"Mocks #9–10 + review"},
+   {label:"Week 4",start:"2027-02-22",end:"2027-02-28",revisionCycle:"R2 finish + weak-topic blitz",gsHeavy:"Weak MCQs",mock:"Mocks #11–12 + review",special:"★ Revision R2 complete"}
+ ]},
+ {id:"2027-03",name:"March 2027",phase:"p3",theme:"Revision R3 + weak-area blitz",
+  subjects:"<b>Static revision round 3</b> (rapid) · <b>2–3 mocks/week</b> · <b>weak-area blitz</b> from the error log · full CA revision · CSAT to a comfortable margin.",
+  checkpoint:{text:"Static revision R3 done · consistent qualifying mock scores · CSAT cleared with margin · CA fully revised.",date:"31 Mar"},
+  review:["Revision round 3 complete","Mock scores consistently above cutoff (both patterns)","CSAT safe with margin","CA compilation revised once fully"],
+  weeks:[
+   {label:"Week 1",start:"2027-03-01",end:"2027-03-07",revisionCycle:"R3 — Polity, Economy, Environment",gsHeavy:"MCQs",mock:"Mocks #13–14"},
+   {label:"Week 2",start:"2027-03-08",end:"2027-03-14",revisionCycle:"R3 — Geography, History, S&T",gsHeavy:"MCQs",mock:"Mocks #15–16"},
+   {label:"Week 3",start:"2027-03-15",end:"2027-03-21",revisionCycle:"R3 finish + Governance / current + Maharashtra layer",gsHeavy:"MCQs",mock:"Mocks #17–18"},
+   {label:"Week 4",start:"2027-03-22",end:"2027-03-28",revisionCycle:"Weak-area blitz + CA full revision",gsHeavy:"Weak MCQs",mock:"Mock #19",special:"★ R3 done · CA revised fully"},
+   {label:"Week 5",start:"2027-03-29",end:"2027-03-31",revisionCycle:"Buffer / weak topics",gsHeavy:"MCQs",mock:"Clear review backlog"}
+ ]},
+ {id:"2027-04",name:"April 2027",phase:"p3",theme:"Mock blitz + final consolidation",
+  subjects:"<b>Alternate-day full mocks (~4/week) + thorough review</b> · targeted revision of <i>only</i> weak topics · <b>CSAT mocks</b> · final CA compilation built.",
+  checkpoint:{text:"20+ full mocks done & reviewed · final revision material locked.",date:"30 Apr"},
+  review:["20+ full mocks done & reviewed","CSAT mocks comfortable","Final revision sheets + CA compilation locked","No new sources from here"],
+  weeks:[
+   {label:"Week 1",start:"2027-04-01",end:"2027-04-04",revisionCycle:"Weak-topic revision",gsHeavy:"Targeted MCQs",mock:"Mocks #20–21 + review"},
+   {label:"Week 2",start:"2027-04-05",end:"2027-04-11",revisionCycle:"Weak-topic revision",gsHeavy:"MCQs",mock:"Mocks #22–24 + review · CSAT mocks begin"},
+   {label:"Week 3",start:"2027-04-12",end:"2027-04-18",revisionCycle:"Final CA compilation",gsHeavy:"MCQs",mock:"Mocks #25–27 + review"},
+   {label:"Week 4",start:"2027-04-19",end:"2027-04-25",revisionCycle:"Lock final 1-page-per-subject sheets",gsHeavy:"MCQs",mock:"Mocks #28–30 + review"},
+   {label:"Week 5",start:"2027-04-26",end:"2027-04-30",revisionCycle:"Revise from final sheets only",gsHeavy:"Light MCQs",mock:"Buffer",special:"★ 20+ mocks done · final sheets locked"}
+ ]},
+ {id:"2027-05",name:"May 2027",phase:"p4",theme:"Peak, simulate, taper → UPSC Prelims (MPSC follows)",
+  subjects:"<b>Full-length simulations at real exam timing</b> · <b>revision only — no new material</b> · temperament + taper. After 23 May, the same base rolls straight into MPSC Rajyaseva prelims.",
+  checkpoint:{text:"Body clock aligned to exam timing · final sheets + CA revised · tapered & rested · logistics sorted.",date:"~23 May"},
+  review:["Body clock aligned to exam timing","Final sheets + CA revised","Tapered, rested, calm","Admit card, centre, kit ready"],
+  weeks:[
+   {label:"Week 1",start:"2027-05-01",end:"2027-05-02",taperRevision:"Revise from final sheets",sim:"Full simulation + review"},
+   {label:"Week 2",start:"2027-05-03",end:"2027-05-09",taperRevision:"Revise CA compilation",sim:"2–3 simulations at exam timing + review · CSAT simulation"},
+   {label:"Week 3",start:"2027-05-10",end:"2027-05-16",taperRevision:"Targeted weak revision · begin sleep regularisation",sim:"2 simulations + review"},
+   {label:"Week 4",start:"2027-05-17",end:"2027-05-22",taperRevision:"TAPER from ~19th — revise only, protect sleep, logistics",sim:"Light simulations early week, then stop",special:"Admit card · centre recce · exam kit ready"}
+ ]}
+];
+
+/* ===== official UPSC CSE syllabus (faithful) + ownership / when / status ===== */
+const OW_CA=[{k:"self",label:"Advait · daily"}];
+const OW_JUL=[{k:"vision",label:"Chanakya · lectures"},{k:"self",label:"Advait · self-study, Jul"}];
+const OW_AUG=[{k:"vision",label:"Chanakya · lectures"},{k:"self",label:"Advait · self-study, Aug"}];
+const OW_SEP=[{k:"vision",label:"Chanakya · lectures"},{k:"self",label:"Advait · self-study, Sep"}];
+const OW_OCT=[{k:"vision",label:"Chanakya · lectures"},{k:"self",label:"Advait · self-study, Oct"}];
+const OW_NOV=[{k:"vision",label:"Chanakya · lectures"},{k:"self",label:"Advait · self-study, Nov"}];
+const OW_DEC=[{k:"vision",label:"Chanakya · lectures"},{k:"self",label:"Advait · self-study, Dec"}];
+const OW_CSAT=[{k:"self",label:"Advait · daily practice"}];
+const OW_SELF=[{k:"self",label:"Advait"}];
+const OW_SOC=[{k:"self",label:"Advait · daily 9–11 slot"}];
+const OW_SELF_ESSAY=[{k:"self",label:"Advait · Phase 2 test series"}];
+
+const SYLLABUS=[
+ {sec:"Preliminary Examination",paper:"Paper I — General Studies (UPSC & MPSC)",marks:"200 marks · 2 hours · merit-ranking in both exams",note:"UPSC and MPSC Rajyaseva prelims share this paper almost word-for-word. The only MPSC delta: 'some weightage to Maharashtra' in history, geography, polity and economy — covered by the Maharashtra layer in Aug–Dec.",
+  areas:[
+   {code:"P-I · 1",name:"Current events of state, national & international importance",owners:OW_CA,when:"Daily · all year",jump:null,
+    official:["Current events of national and international importance.","MPSC adds: current events of STATE importance — Maharashtra CA twice a week in the 7 pm slot."]},
+   {code:"P-I · 2",name:"History of India & Indian National Movement",owners:OW_JUL,when:"Self-study: Jul–Aug 2026",jump:"2026-07",
+    official:["History of India and Indian National Movement.","MPSC adds: some weightage to Maharashtra — the Marathas, Bhakti saints, social reformers (covered Aug & Oct)."]},
+   {code:"P-I · 3",name:"Indian & World Geography",owners:OW_SEP,when:"Self-study: Sep 2026",jump:"2026-09",
+    official:["Indian and World Geography — Physical, Social and Economic Geography of India and the World.","MPSC adds: Physical, Social and Economic Geography of MAHARASHTRA (covered Sep, Week 5)."]},
+   {code:"P-I · 4",name:"Indian Polity & Governance",owners:OW_JUL,when:"Self-study: Jul + Oct 2026",jump:"2026-07",
+    official:["Indian Polity and Governance — Constitution, Political System, Panchayati Raj, Public Policy, Rights Issues, etc.","MPSC frames it as: India AND Maharashtra — polity, urban governance, public policy (Maharashtra pattern covered Oct)."]},
+   {code:"P-I · 5",name:"Economic & Social Development",owners:OW_AUG,when:"Self-study: Aug 2026",jump:"2026-08",
+    official:["Economic and Social Development — Sustainable Development, Poverty, Inclusion, Demographics, Social Sector Initiatives, etc."]},
+   {code:"P-I · 6",name:"Environment, Ecology, Biodiversity & Climate Change",owners:OW_SEP,when:"Self-study: Sep 2026",jump:"2026-09",
+    official:["General issues on Environmental Ecology, Bio-diversity and Climate Change — that do not require subject specialisation."]},
+   {code:"P-I · 7",name:"General Science",owners:OW_NOV,when:"Self-study: Nov 2026",jump:"2026-11",
+    official:["General Science."]}
+  ]},
+ {sec:"Preliminary Examination",paper:"Paper II — CSAT (UPSC & MPSC)",marks:"200 marks · 2 hours · qualifying only (33%) in both exams",note:"Identical structure in both. MPSC adds one component — Marathi & English comprehension passages (Class X/XII), no cross-translation. Daily 15:30 slot covers everything.",
+  areas:[
+   {code:"P-II · 1",name:"Comprehension",owners:OW_CSAT,when:"Daily · Jul 2026 →",jump:null,
+    official:["Comprehension."]},
+   {code:"P-II · 2",name:"Interpersonal skills including communication skills",owners:OW_CSAT,when:"Daily · Jul 2026 →",jump:null,
+    official:["Interpersonal skills including communication skills."]},
+   {code:"P-II · 3",name:"Logical reasoning & analytical ability",owners:OW_CSAT,when:"Daily · Jul 2026 →",jump:null,
+    official:["Logical reasoning and analytical ability."]},
+   {code:"P-II · 4",name:"Decision-making & problem-solving",owners:OW_CSAT,when:"Daily · Jul 2026 →",jump:null,
+    official:["Decision-making and problem-solving."]},
+   {code:"P-II · 5",name:"General mental ability",owners:OW_CSAT,when:"Daily · Jul 2026 →",jump:null,
+    official:["General mental ability."]},
+   {code:"P-II · 6",name:"Basic numeracy & data interpretation",owners:OW_CSAT,when:"Daily · Jul 2026 →",jump:null,
+    official:["Basic numeracy (numbers and their relations, orders of magnitude, etc.) — Class X level.","Data interpretation (charts, graphs, tables, data sufficiency, etc.) — Class X level."]},
+   {code:"P-II · 7",name:"Marathi & English comprehension — MPSC only",owners:OW_CSAT,when:"Comprehension days (Tue/Thu/Sat)",jump:null,
+    official:["Marathi and English language comprehension skills — Class X/XII level.","Tested through passages in each language WITHOUT cross-translation.","MPSC-only component — folded into the CSAT comprehension days."]}
+  ]},
+ {sec:"Main Examination — Qualifying",paper:"Language papers — UPSC A & B · MPSC Papers 1 & 2",marks:"300 marks each · qualifying at 25% in BOTH exams · not counted in merit",note:"One preparation covers both exams: Marathi (UPSC Paper A + MPSC Paper 1) and English (UPSC Paper B + MPSC Paper 2). Light weekly practice in the Phase 2 evening slot.",
+  areas:[
+   {code:"Lang · Mr",name:"Marathi — UPSC Paper A + MPSC Paper 1",owners:OW_SELF,when:"Phase 2 · weekly practice",jump:null,phase2:true,
+    official:["Comprehension of given passages.","Precis writing.","Usage and vocabulary.","Short essays.","Translation from English to Marathi and vice-versa."]},
+   {code:"Lang · En",name:"English — UPSC Paper B + MPSC Paper 2",owners:OW_SELF,when:"Phase 2 · weekly practice",jump:null,phase2:true,
+    official:["Comprehension of given passages.","Precis writing.","Usage and vocabulary.","Short essays."]}
+  ]},
+ {sec:"Main Examination — Merit",paper:"Essay — UPSC Paper I · MPSC Paper 3",marks:"250 marks · counted in merit in both",note:"Advait writes in English (chosen medium — valid for MPSC Papers 3–7 and all UPSC papers). Built on the GS base; dedicated practice in Phase 2.",
+  areas:[
+   {code:"Essay",name:"Essay",owners:OW_SELF_ESSAY,when:"Base now · practice Phase 2",jump:null,phase2:true,
+    official:["Candidates may be required to write essays on multiple topics.","They will be expected to keep closely to the subject of the essay, to arrange their ideas in an orderly fashion, and to write concisely.","Credit will be given for effective and exact expression."]}
+  ]},
+ {sec:"Main Examination — Merit",paper:"GS-I — Heritage, History, Geography & Society (UPSC II · MPSC 4)",marks:"250 marks · counted in merit in both",note:"MPSC GS-1 mirrors UPSC 'with some weightage to Maharashtra' — and names the Bhakti movement & Maharashtra's saints explicitly. One set of notes, one Maharashtra margin-column.",
+  areas:[
+   {code:"GS-I · A",name:"Indian Heritage & Culture",owners:OW_OCT,when:"Base: Oct 2026 · depth Phase 2",jump:"2026-10",phase2:true,
+    official:["Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.","MPSC adds: Bhakti movement and its philosophy, with special reference to the saints' movement in Maharashtra."]},
+   {code:"GS-I · B",name:"Modern Indian History & the Freedom Struggle",owners:OW_JUL,when:"Base: Jul–Aug 2026 · depth Phase 2",jump:"2026-07",phase2:true,
+    official:["Modern Indian history from about the middle of the eighteenth century until the present — significant events, personalities, issues.","The Freedom Struggle — its various stages and important contributors / contributions from different parts of the country.","Post-independence consolidation and reorganization within the country."]},
+   {code:"GS-I · C",name:"History of the World",owners:OW_NOV,when:"Base: Nov 2026 · depth Phase 2",jump:"2026-11",phase2:true,
+    official:["History of the world from the 18th century: Industrial Revolution, world wars, redrawal of national boundaries, colonization, decolonization; political philosophies like communism, capitalism, socialism — their forms and effect on society."]},
+   {code:"GS-I · D",name:"Indian Society",owners:OW_DEC,when:"Base: Dec 2026 · depth Phase 2",jump:"2026-12",phase2:true,
+    official:["Salient features of Indian Society, diversity of India.","Role of women and women's organisations, population and associated issues, poverty and developmental issues, urbanization, their problems and remedies.","Effects of globalization on Indian society.","Social empowerment, communalism, regionalism and secularism.","Huge overlap with Sociology Paper 2 — the optional pays for itself here."]},
+   {code:"GS-I · E",name:"Geography of the World & Society",owners:OW_SEP,when:"Base: Sep 2026 · depth Phase 2",jump:"2026-09",phase2:true,
+    official:["Salient features of world's physical geography.","Distribution of key natural resources across the world (incl. South Asia and the Indian subcontinent); factors for location of primary, secondary and tertiary sector industries.","Important geophysical phenomena (earthquakes, tsunami, volcanic activity, cyclones) and geographical features and their location; changes in critical geographical features and in flora and fauna, and the effects of such changes.","MPSC adds: geography of Maharashtra woven through."]}
+  ]},
+ {sec:"Main Examination — Merit",paper:"GS-II — Governance, Constitution, Polity, Social Justice & IR (UPSC III · MPSC 5)",marks:"250 marks · counted in merit in both",note:"Same syllabus in both exams, MPSC with Maharashtra weightage. Built on the Polity (Jul) and Governance (Oct) base.",
+  areas:[
+   {code:"GS-II · A",name:"Constitution & Polity",owners:OW_JUL,when:"Base: Jul 2026 · depth Phase 2",jump:"2026-07",phase2:true,
+    official:["Indian Constitution — historical underpinnings, evolution, features, amendments, significant provisions and basic structure.","Functions and responsibilities of the Union and the States; issues and challenges of the federal structure; devolution of powers and finances to local levels and challenges therein.","Separation of powers between various organs; dispute redressal mechanisms and institutions.","Comparison of the Indian constitutional scheme with that of other countries.","Parliament and State legislatures — structure, functioning, conduct of business, powers & privileges and issues arising out of these.","Structure, organization and functioning of the Executive and the Judiciary.","Salient features of the Representation of People's Act."]},
+   {code:"GS-II · B",name:"Governance & Accountability",owners:OW_OCT,when:"Base: Oct 2026 · depth Phase 2",jump:"2026-10",phase2:true,
+    official:["Appointment to various Constitutional posts, powers, functions and responsibilities of various Constitutional bodies; statutory, regulatory and various quasi-judicial bodies.","Government policies and interventions for development in various sectors and issues arising out of their design and implementation.","Important aspects of governance, transparency and accountability; e-governance applications, models, successes, limitations and potential; citizens charters and institutional measures.","Role of civil services in a democracy.","Local self-government — with the Maharashtra pattern for MPSC."]},
+   {code:"GS-II · C",name:"Social Justice",owners:OW_OCT,when:"Base: Oct 2026 · depth Phase 2",jump:"2026-10",phase2:true,
+    official:["Welfare schemes for vulnerable sections by the Centre and States and their performance; mechanisms, laws, institutions and bodies for protection of vulnerable sections.","Issues relating to development and management of Social Sector / Services relating to Health, Education, Human Resources.","Issues relating to poverty and hunger.","Development processes and the development industry — NGOs, SHGs, donors, charities, institutional and other stakeholders."]},
+   {code:"GS-II · D",name:"International Relations",owners:OW_NOV,when:"Base: Nov 2026 · depth Phase 2",jump:"2026-11",phase2:true,
+    official:["India and its neighbourhood — relations.","Bilateral, regional and global groupings and agreements involving India and/or affecting India's interests.","Effect of policies and politics of developed and developing countries on India's interests; Indian diaspora.","Important International institutions, agencies and fora — their structure, mandate."]}
+  ]},
+ {sec:"Main Examination — Merit",paper:"GS-III — Economy, Tech, Environment & Security (UPSC IV · MPSC 6)",marks:"250 marks · counted in merit in both",note:"Same syllabus in both. MPSC's version adds 'Disaster Risk Resilience, Resilient Society' under disaster management.",
+  areas:[
+   {code:"GS-III · A",name:"Indian Economy & Inclusive Growth",owners:OW_AUG,when:"Base: Aug 2026 · depth Phase 2",jump:"2026-08",phase2:true,
+    official:["Indian Economy and issues relating to planning, mobilization of resources, growth, development and employment.","Inclusive growth and issues arising from it.","Government budgeting.","Effects of liberalization on the economy, changes in industrial policy and their effects on industrial growth.","Investment models.","MPSC lens: economy of Maharashtra (covered Dec)."]},
+   {code:"GS-III · B",name:"Agriculture & Food Security",owners:OW_AUG,when:"Base: Aug 2026 · depth Phase 2",jump:"2026-08",phase2:true,
+    official:["Major crops, cropping patterns; irrigation systems; storage, transport and marketing of agricultural produce and related constraints; e-technology in the aid of farmers.","Direct and indirect farm subsidies and minimum support prices; Public Distribution System; buffer stocks and food security; technology missions; economics of animal-rearing.","Food processing and related industries — scope, significance, location, supply chain management.","Land reforms in India."]},
+   {code:"GS-III · C",name:"Infrastructure & Investment",owners:OW_AUG,when:"Base: Aug 2026 · depth Phase 2",jump:"2026-08",phase2:true,
+    official:["Infrastructure — energy, ports, roads, airports, railways, etc."]},
+   {code:"GS-III · D",name:"Science & Technology",owners:OW_NOV,when:"Base: Nov 2026 · depth Phase 2",jump:"2026-11",phase2:true,
+    official:["Science and Technology — developments and applications and effects in everyday life.","Achievements of Indians in S&T; indigenization of technology and developing new technology.","Awareness in IT, space, computers, robotics, nano-technology, bio-technology, and issues relating to intellectual property rights."]},
+   {code:"GS-III · E",name:"Environment & Disaster Management",owners:OW_SEP,when:"Base: Sep 2026 · depth Phase 2",jump:"2026-09",phase2:true,
+    official:["Conservation, environmental pollution and degradation, environmental impact assessment.","Disaster and disaster management.","MPSC adds: Disaster Risk Resilience, Resilient Society."]},
+   {code:"GS-III · F",name:"Internal Security",owners:OW_NOV,when:"Base: Nov 2026 · depth Phase 2",jump:"2026-11",phase2:true,
+    official:["Linkages between development and spread of extremism.","Role of external state and non-state actors in creating challenges to internal security.","Challenges to internal security through communication networks; role of media and social networking sites; basics of cyber security; money-laundering and its prevention.","Security challenges and their management in border areas; linkages of organized crime with terrorism.","Various security forces and agencies and their mandate."]}
+  ]},
+ {sec:"Main Examination — Merit",paper:"GS-IV — Ethics, Integrity & Aptitude (UPSC V · MPSC 7)",marks:"250 marks · counted in merit in both",note:"Word-for-word identical in UPSC and MPSC. Framework built in Dec; case-study depth in Phase 2.",
+  areas:[
+   {code:"GS-IV · A",name:"Ethics & Human Interface",owners:OW_DEC,when:"Base: Dec 2026 · depth Phase 2",jump:"2026-12",phase2:true,
+    official:["Essence, determinants and consequences of ethics in human actions; dimensions of ethics; ethics in private and public relationships.","Human values — lessons from the lives and teachings of great leaders, reformers and administrators; role of family, society and educational institutions in inculcating values."]},
+   {code:"GS-IV · B",name:"Attitude & Emotional Intelligence",owners:OW_DEC,when:"Base: Dec 2026 · depth Phase 2",jump:"2026-12",phase2:true,
+    official:["Attitude — content, structure, function; its influence and relation with thought and behaviour; moral and political attitudes; social influence and persuasion.","Emotional intelligence — concepts, and their utilities and application in administration and governance."]},
+   {code:"GS-IV · C",name:"Aptitude & Foundational Values",owners:OW_DEC,when:"Base: Dec 2026 · depth Phase 2",jump:"2026-12",phase2:true,
+    official:["Aptitude and foundational values for civil service — integrity, impartiality and non-partisanship, objectivity, dedication to public service, empathy, tolerance and compassion towards the weaker sections.","Contributions of moral thinkers and philosophers from India and the world."]},
+   {code:"GS-IV · D",name:"Public Service Values & Probity",owners:OW_DEC,when:"Base: Dec 2026 · depth Phase 2",jump:"2026-12",phase2:true,
+    official:["Public / civil service values and ethics in public administration — status and problems; ethical concerns and dilemmas in government and private institutions; laws, rules, regulations and conscience as sources of ethical guidance; accountability and ethical governance; ethical issues in international relations and funding; corporate governance.","Probity in governance — concept of public service; philosophical basis of governance and probity; information sharing and transparency, Right to Information, codes of ethics, codes of conduct, citizen's charters, work culture, quality of service delivery, utilization of public funds, challenges of corruption."]},
+   {code:"GS-IV · E",name:"Case Studies",owners:OW_SELF,when:"Dec 2026 + Phase 2 practice",jump:"2026-12",phase2:true,
+    official:["Case studies on the above issues."]}
+  ]},
+ {sec:"Optional — Sociology",paper:"Sociology Paper I — Fundamentals of Sociology (UPSC VI · MPSC 8)",marks:"250 marks · counted in merit in both exams",note:"Sociology sits on BOTH optional lists (MPSC subject 24) — one optional, two mains. Daily 9–11 slot; Paper 1 done by 20 Sep 2026.",
+  areas:[
+   {code:"SOC-I · 1",name:"The Discipline & Sociology as Science",owners:OW_SOC,when:"Jul 2026 · daily 9–11",jump:"2026-07",
+    official:["Sociology — the Discipline: modernity and social changes in Europe and the emergence of sociology; scope of the subject and comparison with other social sciences; sociology and common sense.","Sociology as Science: science, scientific method and critique; major theoretical strands of research methodology; positivism and its critique; fact–value and objectivity; non-positivist methodologies."]},
+   {code:"SOC-I · 2",name:"Research Methods & Analysis",owners:OW_SOC,when:"Jul 2026 · daily 9–11",jump:"2026-07",
+    official:["Qualitative and quantitative methods.","Techniques of data collection.","Variables, sampling, hypothesis, reliability and validity."]},
+   {code:"SOC-I · 3",name:"Sociological Thinkers",owners:OW_SOC,when:"Jul–Aug 2026 · daily 9–11",jump:"2026-07",
+    official:["Karl Marx — historical materialism, mode of production, alienation, class struggle.","Emile Durkheim — division of labour, social fact, suicide, religion and society.","Max Weber — social action, ideal types, authority, bureaucracy, protestant ethic and the spirit of capitalism.","Talcott Parsons — social system, pattern variables.","Robert K. Merton — latent and manifest functions, conformity and deviance, reference groups.","Mead — self and identity."]},
+   {code:"SOC-I · 4",name:"Stratification & Mobility · Works & Economic Life",owners:OW_SOC,when:"Aug 2026 · daily 9–11",jump:"2026-08",
+    official:["Concepts — equality, inequality, hierarchy, exclusion, poverty and deprivation.","Theories of social stratification — structural-functionalist, Marxist, Weberian.","Dimensions — social stratification of class, status groups, gender, ethnicity and race.","Social mobility — open and closed systems, types of mobility, sources and causes of mobility.","Social organization of work in different types of society — slave society, feudal society, industrial/capitalist society.","Formal and informal organization of work.","Labour and society."]},
+   {code:"SOC-I · 5",name:"Politics & Society · Religion & Society",owners:OW_SOC,when:"Aug–Sep 2026 · daily 9–11",jump:"2026-08",
+    official:["Sociological theories of power.","Power elite, bureaucracy, pressure groups and political parties.","Nation, state, citizenship, democracy, civil society, ideology.","Protest, agitation, social movements, collective action, revolution.","Sociological theories of religion.","Types of religious practices: animism, monism, pluralism, sects, cults.","Religion in modern society: religion and science, secularization, religious revivalism, fundamentalism."]},
+   {code:"SOC-I · 6",name:"Systems of Kinship · Social Change in Modern Society",owners:OW_SOC,when:"Sep 2026 · daily 9–11",jump:"2026-09",
+    official:["Family, household, marriage.","Types and forms of family.","Lineage and descent.","Patriarchy and sexual division of labour.","Contemporary trends.","Sociological theories of social change.","Development and dependency.","Agents of social change.","Education and social change.","Science, technology and social change."]}
+  ]},
+ {sec:"Optional — Sociology",paper:"Sociology Paper II — Indian Society: Structure & Change (UPSC VII · MPSC 9)",marks:"250 marks · counted in merit in both exams",note:"Deep overlap with GS-I (Indian Society) and MPSC's Maharashtra layer — the reformers, movements and rural transformation all pay twice. Done by 13 Dec 2026.",
+  areas:[
+   {code:"SOC-II · 1",name:"Perspectives on Indian Society & Colonial Impact",owners:OW_SOC,when:"Sep 2026 · daily 9–11",jump:"2026-09",
+    official:["Perspectives on the study of Indian society — Indology (G.S. Ghurye), Structural functionalism (M.N. Srinivas), Marxist sociology (A.R. Desai).","Impact of colonial rule on Indian society — social background of Indian nationalism; modernization of Indian tradition; protests and movements during the colonial period; social reforms."]},
+   {code:"SOC-II · 2",name:"Caste System · Rural & Agrarian Structure",owners:OW_SOC,when:"Oct 2026 · daily 9–11",jump:"2026-10",
+    official:["Caste system — perspectives (Ghurye, Srinivas, Dumont, Beteille); features of the caste system; untouchability — forms and perspectives.","Rural and agrarian social structure — the idea of the Indian village and village studies; agrarian social structure, evolution of the land tenure system, land reforms."]},
+   {code:"SOC-II · 3",name:"Tribes · Social Classes · Kinship · Religion & Minorities",owners:OW_SOC,when:"Oct 2026 · daily 9–11",jump:"2026-10",
+    official:["Tribal communities in India — definitional problems, geographical spread, colonial policies and tribes, issues of integration and autonomy.","Social classes in India — agrarian, industrial, middle classes.","Systems of kinship in India — lineage and descent, types of kinship systems, family and marriage, household dimensions, patriarchy, entitlements and sexual division of labour.","Religion and society — religious communities in India, problems of religious minorities."]},
+   {code:"SOC-II · 4",name:"Visions of Social Change · Rural Transformation",owners:OW_SOC,when:"Nov 2026 · daily 9–11",jump:"2026-11",
+    official:["Visions of social change in India — idea of development planning and mixed economy; constitution, law and social change; education and social change.","Rural and agrarian transformation — programmes of rural development, Community Development Programme, cooperatives, poverty alleviation schemes; Green Revolution and social change; changing modes of production in Indian agriculture; problems of rural labour, bondage, migration."]},
+   {code:"SOC-II · 5",name:"Industrialisation & Urbanisation · Politics · Social Movements",owners:OW_SOC,when:"Nov 2026 · daily 9–11",jump:"2026-11",
+    official:["Industrialization and urbanisation — evolution of modern industry; growth of urban settlements; working class structure, growth, class mobilization; informal sector, child labour; slums and deprivation in urban areas.","Politics and society — nation, democracy and citizenship; political parties, pressure groups, social and political elite; regionalism and decentralization of power; secularization.","Social movements in modern India — peasants and farmers movements; women's movement; backward classes and Dalit movements; environmental movements; ethnicity and identity movements."]},
+   {code:"SOC-II · 6",name:"Population Dynamics · Challenges of Social Transformation",owners:OW_SOC,when:"Dec 2026 · daily 9–11",jump:"2026-12",
+    official:["Population dynamics — population size, growth, composition and distribution; components of population growth (birth, death, migration); population policy and family planning; emerging issues (ageing, sex ratios, child and infant mortality, reproductive health).","Challenges of social transformation — crisis of development (displacement, environmental problems and sustainability); poverty, deprivation and inequalities; violence against women; caste conflicts; ethnic conflicts, communalism, religious revivalism; illiteracy and disparities in education."]}
+  ]},
+ {sec:"Personality Test",paper:"Interview — UPSC 275 · MPSC 275",marks:"Counted in merit in both exams",note:"Both commissions assess suitability for public service — judgment, balance, depth of interest — not knowledge alone. After Mains.",
+  areas:[
+   {code:"INT",name:"Personality Test",owners:OW_SELF,when:"Phase 3 · after Mains",jump:null,phase2:true,
+    official:["A purposive conversation to assess the candidate's suitability for a career in public service.","Assesses mental alertness, critical powers of assimilation, clear and logical exposition, balance of judgement, variety and depth of interest, ability for social cohesion and leadership, and intellectual and moral integrity.","Not a strict cross-examination but a natural, directed and purposive conversation."]}
+  ]}
+];
+
+/* ===== render: TODAY ===== */
+function buildDayBlocks(iso){
+  const ph=getPhase(iso); if(!ph) return null;
+  const wd=dow(iso), sun=wd===0, sat=wd===6;
+  const m=getMonth(iso), wk=getWeek(m,iso);
+  let base;
+  if(ph.id==="p1"||ph.id==="p2") base= sun?CLOCK_CLASS_SUN:CLOCK_CLASS;
+  else if(ph.id==="p3") base= sun?CLOCK_PRELIMS_SUN:CLOCK_PRELIMS;
+  else base=CLOCK_TAPER;
+  const out=base.map(b=>{const blk={...b}; if(b.slot&&wk&&wk[b.slot])blk.sub=wk[b.slot]; return blk;});
+  if((ph.id==="p1"||ph.id==="p2")&&sat){
+    const i=out.findIndex(b=>b.slot==="eveningRotation");
+    if(i>=0) out[i]={t:out[i].t,title:"Week wrap — clear backlog + preview next week",sub:"Light close; the weekly test is Sunday morning",type:"heavy",cat:"Deep work"};
+  }
+  if(ph.id==="p3"&&sat){const i=out.findIndex(b=>b.slot==="mock"); if(i>=0) out[i].sub="Weekly full mock + thorough review";}
+  return out;
+}
+function journeyHTML(){
+  const totalDays=daysBetween(PLAN_START,EXAM)+1;
+  const segHTML=PHASES.map(p=>{const w=daysBetween(p.start,p.end)+1;return '<div class="journey-seg" style="flex:'+w+' 0 0;background:'+p.color+'"></div>';}).join("");
+  let pos; if(selectedISO<PLAN_START)pos=0; else if(selectedISO>EXAM)pos=100; else pos=Math.max(0,Math.min(100,daysBetween(PLAN_START,selectedISO)/totalDays*100));
+  const ph=getPhase(selectedISO), toExam=daysBetween(selectedISO,EXAM);
+  let label;
+  if(selectedISO<PLAN_START)label='<b>Not started</b> — the road runs 6 Jul → 23 May';
+  else if(selectedISO>EXAM)label='<b>Prelims complete.</b>';
+  else label='<b>'+ph.name+'</b> · '+Math.round(pos)+'% of the road · <b>'+toExam+'</b> days to Prelims';
+  return '<div class="journey"><div class="journey-track">'+segHTML+'<div class="journey-marker" style="left:'+pos+'%"></div></div>'+
+    '<div class="journey-meta"><span>6 Jul \'26</span><span>23 May \'27</span></div><div class="journey-label">'+label+'</div></div>';
+}
+function toggleBlock(i){const t=store.ticks[selectedISO]||(store.ticks[selectedISO]={}); if(t[i])delete t[i]; else t[i]=1; saveStore(store); renderToday();renderProgress();}
+/* ===== render: THIS MONTH ===== */
+function wkRow(tag,val){if(!val)return""; return '<div class="wk-row"><div class="wk-tag">'+esc(tag)+'</div><div class="wk-val">'+esc(val)+'</div></div>';}
+function toggleReview(key){if(store.review[key])delete store.review[key]; else store.review[key]=1; saveStore(store); renderMonth();}
+function renderMonth(){
+  const el=document.getElementById("view-month"); const m=getMonth(selectedISO);
+  if(!m){el.innerHTML='<div class="card state-card"><div class="eyebrow">Outside the plan window</div><div class="lead" style="margin-top:12px">'+
+    (selectedISO<PLAN_START?'The plan runs Jul 2026 → May 2027.':'Prelims is behind you.')+'</div><p>Pick a date between 6 Jul 2026 and 23 May 2027.</p>'+
+    (selectedISO<PLAN_START?'<button class="pill-btn" onclick="jumpTo(\'2026-07-06\')">Go to July 2026 →</button>':'')+'</div>'; return;}
+  const ph=PHASES.find(p=>p.id===m.phase), wkNow=getWeek(m,selectedISO), idx=MONTHS.indexOf(m)+1;
+  const weeksHTML=m.weeks.map(w=>{
+    const isNow=wkNow&&w.start===wkNow.start; let rows="";
+    if(m.phase==="p1"||m.phase==="p2"){rows+=wkRow("Sociology",w.socioMorning); rows+=wkRow("GS · day",w.gsHeavy); rows+=wkRow("GS · eve",w.gsSecond);}
+    else if(m.phase==="p3"){rows+=wkRow("Revision",w.revisionCycle); rows+=wkRow("Practice",w.gsHeavy); rows+=wkRow("Mock",w.mock);}
+    else {rows+=wkRow("Simulation",w.sim); rows+=wkRow("Revision",w.taperRevision);}
+    const sp=w.special?'<div class="wk-special">'+esc(w.special)+'</div>':'';
+    return '<div class="week '+(isNow?'now open':'')+'"><div class="week-hd" onclick="this.parentNode.classList.toggle(\'open\')">'+
+      '<span class="wk-label">'+esc(w.label)+'</span><span class="wk-dates">'+fmtShort(w.start)+'–'+fmtShort(w.end)+'</span><span class="chev"></span></div>'+
+      '<div class="week-body"><div class="week-inner">'+rows+sp+'</div></div></div>';
+  }).join("");
+  const reviewHTML=m.review.map((r,i)=>{const key=m.id+"|"+i, done=!!store.review[key];
+    return '<div class="check-item '+(done?'done':'')+'" onclick="toggleReview(\''+key+'\')"><div class="ci-box">'+CHECK_ICON+'</div><div class="ci-text">'+esc(r)+'</div></div>';}).join("");
+  const rdone=m.review.filter((r,i)=>store.review[m.id+"|"+i]).length;
+  el.innerHTML='<div class="month-head"><div class="mh-main"><div class="eyebrow">Month '+idx+' of 11</div>'+
+    '<h1 class="day" style="font-size:25px">'+esc(m.name)+'</h1><div class="theme">'+esc(m.theme)+'</div></div>'+
+    '<div class="phase-badge" style="background:'+ph.color+'">'+esc(ph.name)+'</div></div>'+
+    '<div class="checkpoint"><div class="eyebrow">Checkpoint · '+esc(m.checkpoint.date)+'</div><div class="cp-text">'+esc(m.checkpoint.text)+'</div></div>'+
+    '<div class="subjects">'+m.subjects+'</div>'+
+    '<div class="section-title"><span class="num">B</span>Week by week</div>'+weeksHTML+
+    '<div class="section-title"><span class="num">✓</span>Month-end review <span style="font-family:var(--mono);font-size:12px;color:var(--ink-faint);font-weight:400">'+rdone+'/'+m.review.length+'</span></div>'+
+    '<div class="card">'+reviewHTML+'</div>';
+}
+
+/* ===== render: FULL PLAN ===== */
+function addMock(){const n=document.getElementById("mkName").value.trim(), s=document.getElementById("mkScore").value.trim();
+  if(!n&&!s)return; store.mocks.unshift({date:selectedISO,name:n||"Mock",score:s||"—"}); saveStore(store); renderPlan();renderProgress();}
+function delMock(i){store.mocks.splice(i,1); saveStore(store); renderPlan();renderProgress();}
+function resetAll(){if(confirm("Reset every tick, note, check-in, syllabus status and mock score? This can't be undone.")){store={ticks:{},review:{},mocks:[],syllabus:{},energy:{},notes:{}}; saveStore(store); renderAll();}}
+function renderPlan(){
+  const el=document.getElementById("view-plan");
+  const base=todayISO()<PLAN_START?PLAN_START:(todayISO()>EXAM?EXAM:todayISO());
+  const toExam=Math.max(0,daysBetween(base,EXAM)), refISO=selectedISO;
+  const phasesHTML=PHASES.map(p=>{let status,cls;
+    if(refISO>p.end){status="Done";cls="ps-done";} else if(refISO>=p.start&&refISO<=p.end){status="Now";cls="ps-now";} else {status="Upcoming";cls="ps-next";}
+    return '<div class="phase-card"><div class="phase-dot" style="background:'+p.color+'"></div><div class="pc-main">'+
+      '<div class="pc-name">'+esc(p.name)+'</div><div class="pc-dates">'+esc(p.dates)+'</div><div class="pc-job">'+esc(p.job)+'</div>'+
+      '<div class="pc-cp">◆ '+esc(p.cp)+'</div></div><div class="phase-status '+cls+'">'+status+'</div></div>';}).join("");
+  const clockAcc=(title,arr,sub)=>'<div class="acc"><div class="acc-hd" onclick="this.parentNode.classList.toggle(\'open\')"><span class="ah-title">'+title+'</span><span class="chev"></span></div>'+
+    '<div class="acc-body"><div class="acc-inner"><div style="font-size:12px;color:var(--ink-faint);margin-top:12px">'+sub+'</div>'+
+    arr.map(b=>'<div class="mini-clock"><span class="mc-time">'+b.t+'</span><span class="mc-txt"><b>'+esc(b.title)+'</b>'+(b.sub?' · <span>'+esc(b.sub)+'</span>':'')+'</span></div>').join("")+'</div></div></div>';
+  const principles=["<b>One prep, two exams:</b> the new MPSC Rajyaseva pattern mirrors UPSC almost word-for-word — study once at UPSC depth, keep a Maharashtra margin-column (saints & Bhakti, Marathas, reformers, Maharashtra geography & economy) for MPSC.","<b>Same-day consolidation</b> of every lecture — un-revised lectures are half-lost by tomorrow.","<b>Spaced revision:</b> revisit new learning at 24 hrs → 7 days → 30 days.","<b>Equal GS focus:</b> two subjects always run in parallel; no GS paper goes more than 10 days cold.","<b>One static, two lenses:</b> read once for understanding (Mains) and tag MCQ angles (Prelims).","<b>Review &gt; attempt:</b> a mock or Sunday test you don\'t dissect is just stress.","<b>Sustainability is strategy:</b> the 7:15 workout + meditation is never traded for desk time; Sunday evenings off; ~7 hrs sleep."];
+  const revision=["<b>Daily:</b> 30-min end-of-day active recall (22:30 block).","<b>Weekly (Sunday):</b> morning test + review, afternoon cumulative revision + CA consolidation.","<b>Monthly:</b> final Sunday doubles as full-month revision.","<b>From January:</b> rolling 7–10 day cycle so no subject is ever &gt;10 days cold. Target 3+ static revisions before Prelims."];
+  const wellbeing=["<b>The 7:15 workout + meditation anchors everything</b> — it is the first block of the day, not a reward after it.","<b>Sleep ~7 hrs (23:00–6:45)</b> — memory consolidates in sleep, so it raises output.","<b>The 3–4:30 dip is normal</b> — that\'s why CSAT lives at 15:30.","<b>~50/10 focus/break</b> inside long blocks.","<b>Sunday evenings off are non-negotiable.</b>"];
+  const mocksHTML=store.mocks.length?store.mocks.map((mk,i)=>'<div class="mock-row"><span class="mr-date">'+fmtShort(mk.date)+'</span><span class="mr-name">'+esc(mk.name)+'</span><span class="mr-score">'+esc(mk.score)+'</span><span class="mr-del" onclick="delMock('+i+')">×</span></div>').join(""):'<div class="empty">No mock scores yet. Add your first after a full mock.</div>';
+  el.innerHTML='<div class="eyebrow">The whole road</div><h1 class="day" style="font-size:25px;margin-bottom:16px">Full Plan</h1>'+
+    '<div class="countdown-card"><div class="cd-num">'+toExam+'<small> d</small></div><div class="cd-label">to UPSC Prelims (from today)</div><div class="cd-date">23 May 2027 · UPSC Annual Calendar 2027 (may be revised) · MPSC 2027: TBA</div></div>'+
+    '<div class="section-title"><span class="num">A.1</span>Four phases</div>'+phasesHTML+
+    '<div class="section-title"><span class="num">A.3</span>The three daily clocks</div>'+
+    clockAcc("Clock 1 — Foundation (Jul–Dec, Mon–Sat)",CLOCK_CLASS,"Workout + meditation before 9 · desk 9:00–23:00 · Sunday = weekly test + revision, evening off.")+
+    clockAcc("Clock 2 — Prelims intensive (Jan–Apr)",CLOCK_PRELIMS,"Mock-and-revision driven, alternating UPSC & MPSC pattern. Sundays lighter.")+
+    clockAcc("Clock 3 — Peak & taper (May)",CLOCK_TAPER,"Simulations at real exam timing; revision only.")+
+    '<div class="section-title"><span class="num">A.2</span>Principles that decide it</div>'+
+    '<div class="acc"><div class="acc-hd" onclick="this.parentNode.classList.toggle(\'open\')"><span class="ah-title">Six principles</span><span class="chev"></span></div><div class="acc-body"><div class="acc-inner"><ol>'+principles.map(p=>'<li>'+p+'</li>').join("")+'</ol></div></div></div>'+
+    '<div class="section-title"><span class="num">A.4</span>Revision architecture</div>'+
+    '<div class="acc"><div class="acc-hd" onclick="this.parentNode.classList.toggle(\'open\')"><span class="ah-title">How not to forget</span><span class="chev"></span></div><div class="acc-body"><div class="acc-inner"><ul>'+revision.map(p=>'<li>'+p+'</li>').join("")+'</ul></div></div></div>'+
+    '<div class="section-title"><span class="num">A.5</span>Wellbeing</div>'+
+    '<div class="acc"><div class="acc-hd" onclick="this.parentNode.classList.toggle(\'open\')"><span class="ah-title">Sustainability is strategy</span><span class="chev"></span></div><div class="acc-body"><div class="acc-inner"><ul>'+wellbeing.map(p=>'<li>'+p+'</li>').join("")+'</ul></div></div></div>'+
+    '<div class="section-title"><span class="num">★</span>Mock score log</div>'+
+    '<div class="card"><div class="mock-form"><input class="mf-name" id="mkName" placeholder="Mock name (e.g. GS full #3 / MPSC #1)"><input class="mf-score" id="mkScore" placeholder="Score" inputmode="numeric"><button onclick="addMock()">Add</button></div><div class="mock-list">'+mocksHTML+'</div></div>'+
+    '<div class="section-title"><span class="num">↥</span>Your data</div>'+
+    '<div class="tool-card"><h3>Portable by design</h3><p>Everything lives on this device. Make a backup occasionally so progress can move safely to another phone or browser.</p><div class="tool-actions">'+
+    '<button class="soft-btn" onclick="exportData()">Export backup</button><label class="soft-btn import-label">Import backup<input type="file" accept="application/json" onchange="importData(this.files[0])"></label>'+
+    '<button class="soft-btn danger" onclick="resetAll()">Reset all</button></div></div>'+
+    '<div class="footnote">UPSC Prelims 23 May 2027 is as listed in the UPSC Annual Calendar 2027 \u2014 commissions can revise calendars, so re-confirm closer to the date. MPSC Rajyaseva 2027 dates follow MPSC\u2019s annual schedule \u2014 re-anchor when announced; the same preparation carries into it since the syllabi now mirror each other. Chanakya\u2019s lecture order may differ from this spine \u2014 lectures slot into the 11 am block for whichever subject is running; the spine tracks Advait\u2019s self-study pass.<br><button class="reset-btn" onclick="resetAll()">Reset all progress</button></div>';
+}
+
+/* ===== render: SYLLABUS ===== */
+const STATUS=[{label:"Not started",cls:"st-none"},{label:"Learning",cls:"st-learning"},{label:"Revised",cls:"st-revised"},{label:"Confident",cls:"st-confident"}];
+function cycleStatus(code){const cur=store.syllabus[code]||0; store.syllabus[code]=(cur+1)%4; saveStore(store); renderSyllabus();renderProgress();renderToday();}
+function jumpToMonth(mid){const first=mid+"-01"; selectedISO=clampISO(first<PLAN_START?PLAN_START:first); document.getElementById("datePick").value=selectedISO; renderAll(); setView("month");}
+function grp(sec){if(sec.indexOf("Prelim")>=0)return"Preliminary Examination"; if(sec.indexOf("Main")>=0)return"Main Examination"; if(sec.indexOf("Optional")>=0)return"Optional — Sociology"; return"Personality Test";}
+function renderSyllabus(){
+  const el=document.getElementById("view-syllabus");
+  const all=SYLLABUS.reduce((a,s)=>a.concat(s.areas),[]);
+  const N=all.length;
+  let cC=0,cR=0,cL=0;
+  all.forEach(a=>{const st=store.syllabus[a.code]||0; if(st===3)cC++; else if(st===2)cR++; else if(st===1)cL++;});
+  const touched=cC+cR+cL;
+  const seal='<svg class="gz-seal" viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="none" stroke="var(--gov-gold)" stroke-width="2"/>'+
+    '<circle cx="32" cy="32" r="23" fill="none" stroke="var(--gov-gold)" stroke-width="1" opacity=".55"/>'+
+    '<path d="M32 11 L35 29 L53 32 L35 35 L32 53 L29 35 L11 32 L29 29 Z" fill="var(--gov-gold)"/>'+
+    '<path d="M32 20 L33.5 30.5 L44 32 L33.5 33.5 L32 44 L30.5 33.5 L20 32 L30.5 30.5 Z" fill="var(--gov-paper)" opacity=".9"/></svg>';
+  let html='<div class="gz-head">'+seal+'<div class="gz-emblem">UPSC · Civil Services &nbsp;+&nbsp; MPSC · Rajyaseva</div>'+
+    '<div class="gz-title">Combined Official Syllabus<br>UPSC CSE · MPSC Rajyaseva</div>'+
+    '<div class="gz-sub">One syllabus, two exams — faithfully reproduced, annotated with when Advait studies it and where he stands</div>'+
+    '<div class="gz-rule"></div><div class="gz-foot">CSE + Rajyaseva 2027 · Prelims · Mains · Optional (Sociology) · Interview</div></div>';
+  const segC=N?cC/N*100:0, segR=N?cR/N*100:0, segL=N?cL/N*100:0;
+  html+='<div class="meter"><div class="meter-top"><span class="mt-l">Coverage</span><span class="mt-r">'+touched+' / '+N+' areas touched</span></div>'+
+    '<div class="meter-bar"><div class="meter-seg s-confident" style="width:'+segC+'%"></div><div class="meter-seg s-revised" style="width:'+segR+'%"></div><div class="meter-seg s-learning" style="width:'+segL+'%"></div></div>'+
+    '<div class="meter-legend">'+
+    '<span class="lg"><span class="sw" style="background:var(--done)"></span>Confident · '+cC+'</span>'+
+    '<span class="lg"><span class="sw" style="background:var(--revise)"></span>Revised · '+cR+'</span>'+
+    '<span class="lg"><span class="sw" style="background:var(--learn)"></span>Learning · '+cL+'</span>'+
+    '<span class="lg"><span class="sw" style="background:var(--line-soft)"></span>Not started · '+(N-touched)+'</span>'+
+    '</div><div class="syl-sec-note" style="margin-top:10px">Tap any area\'s status chip to advance it: Not started → Learning → Revised → Confident.</div></div>';
+  let lastGroup="";
+  SYLLABUS.forEach(s=>{
+    const g=grp(s.sec);
+    if(g!==lastGroup){html+='<div class="syl-sec"><div class="syl-sec-hd"><span class="syl-sec-tag">'+esc(g)+'</span></div></div>'; lastGroup=g;}
+    let head='<div style="margin-top:14px"><div style="font-weight:700;font-size:13.5px">'+esc(s.paper)+'</div>';
+    if(s.marks)head+='<div style="font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);margin-top:2px">'+esc(s.marks)+'</div>';
+    if(s.note)head+='<div class="syl-sec-note" style="margin-top:6px">'+esc(s.note)+'</div>';
+    head+='</div>';
+    html+=head;
+    s.areas.forEach(a=>{
+      const st=store.syllabus[a.code]||0;
+      const owners=a.owners.map(o=>'<span class="owner '+(o.k==="vision"?"vision":"self")+'">'+esc(o.label)+'</span>').join("");
+      const p2=a.phase2?('<span class="phase2">'+((a.when&&a.when.indexOf("Phase 3")>=0)?"Phase 3":"Phase 2 · post-Prelims")+'</span>'):'';
+      const when='<span class="when">'+esc(a.when)+'</span>';
+      const off='<ul>'+a.official.map(o=>'<li>'+esc(o)+'</li>').join("")+'</ul>';
+      const jump=a.jump?'<div class="tile-jump" onclick="jumpToMonth(\''+a.jump+'\')">↳ Go to '+esc(getMonth(a.jump+"-01")?getMonth(a.jump+"-01").name:a.jump)+'</div>':'';
+      html+='<div class="tile"><div class="tile-hd" onclick="this.parentNode.classList.toggle(\'open\')">'+
+        '<span class="tile-code">'+esc(a.code)+'</span>'+
+        '<div class="tile-main"><div class="tile-name">'+esc(a.name)+'</div><div class="tile-meta">'+owners+when+p2+'</div></div>'+
+        '<div class="tile-status"><button class="stbtn '+STATUS[st].cls+'" onclick="event.stopPropagation();cycleStatus(\''+a.code+'\')">'+STATUS[st].label+'</button></div>'+
+        '</div><div class="tile-body"><div class="tile-inner"><div class="official">'+off+'</div>'+jump+'</div></div></div>';
+    });
+  });
+  el.innerHTML=html;
+}
+
+/* ===== V3 intelligence layer ===== */
+function addDays(iso,n){const d=mkDate(iso);d.setDate(d.getDate()+n);return isoOf(d);}
+function completionFor(iso){
+  const blocks=buildDayBlocks(iso); if(!blocks)return{done:0,total:0,pct:0};
+  const ticks=store.ticks[iso]||{}; let done=0,total=0;
+  blocks.forEach((b,i)=>{if(TICKABLE.has(b.type)){total++;if(ticks[i])done++;}});
+  return{done,total,pct:total?Math.round(done/total*100):0};
+}
+function streakAt(iso){
+  if(iso<PLAN_START)return 0;
+  let d=iso>EXAM?EXAM:iso,n=0;
+  while(d>=PLAN_START){const c=completionFor(d);if(c.total&&c.pct>=50){n++;d=addDays(d,-1);}else break;}
+  return n;
+}
+function syllabusScore(){
+  const all=SYLLABUS.reduce((a,s)=>a.concat(s.areas),[]);
+  const points=all.reduce((n,a)=>n+(store.syllabus[a.code]||0),0);
+  return all.length?Math.round(points/(all.length*3)*100):0;
+}
+function setEnergy(level){store.energy[selectedISO]=level;saveStore(store);renderToday();}
+function saveDailyNote(){
+  const el=document.getElementById("dailyReflection"); if(!el)return;
+  store.notes[selectedISO]=el.value.trim();saveStore(store);renderProgress();
+  const s=document.getElementById("noteSaved");if(s){s.classList.add("show");setTimeout(()=>s.classList.remove("show"),1200);}
+}
+function v3BlockHTML(b,i,done,essential){
+  const tick=TICKABLE.has(b.type),cat=b.cat?'<span class="blk-cat">'+esc(b.cat)+'</span>':'';
+  const sub=b.sub?'<div class="blk-sub">'+b.sub+'</div>':'';
+  const check=tick?'<div class="blk-check" onclick="toggleBlock('+i+')"><div class="checkbox">'+CHECK_ICON+'</div></div>':'';
+  return '<div class="blk t-'+b.type+' '+(tick?'':'rest')+' '+(done?'done':'')+' '+(essential?'keystone':'')+'"><div class="blk-bar"></div>'+
+    '<div class="blk-time">'+b.t+'</div><div class="blk-body"><div class="blk-title">'+esc(b.title)+'</div>'+sub+cat+'</div>'+check+'</div>';
+}
+function dailyMission(ph,wk,sun){
+  if(ph.id==="p1"||ph.id==="p2"){
+    if(sun)return{title:"Test the week. Diagnose, don’t judge.",why:"A reviewed mistake is converted into marks."};
+    return{title:(wk&&wk.gsHeavy)||"Build the day’s core GS block.",why:"Protect the late-morning peak; the rest of the day can flex."};
+  }
+  if(ph.id==="p3")return{title:(wk&&wk.mock)||"Revision, MCQs, review.",why:"Prelims is won by retrieval and error correction, not passive hours."};
+  return{title:"Stay sharp. Add nothing new.",why:"Calm execution is the final form of preparation."};
+}
+function renderToday(){
+  const el=document.getElementById("view-today"),ph=getPhase(selectedISO);
+  el.classList.toggle("is-low",false);
+  if(selectedISO<PLAN_START){
+    const dd=daysBetween(selectedISO,PLAN_START);
+    el.innerHTML='<div class="command-hero"><div class="hero-kicker">Runway</div><div class="hero-title">The mission begins 6 July 2026.</div><div class="hero-sub">Set the environment, protect sleep, and arrive hungry—not tired.</div><div class="hero-line"></div><div class="hero-stats"><div class="hero-stat"><b>'+dd+'</b><span>days to launch</span></div><div class="hero-stat"><b>322</b><span>day campaign</span></div><div class="hero-stat"><b>4</b><span>phases</span></div></div></div>'+
+      '<button class="pill-btn" onclick="jumpTo(\'2026-07-06\')">Preview Day 1 →</button>'+journeyHTML();return;
+  }
+  if(selectedISO===EXAM){
+    el.innerHTML='<div class="command-hero"><div class="hero-kicker">23 May 2027 · Exam day</div><div class="hero-title">Nothing to prove today. Just execute.</div><div class="hero-sub">Read cleanly. Breathe between sections. Trust the repetitions behind you.</div><div class="hero-line"></div><div style="font-family:var(--serif);font-size:20px;color:var(--lime)">All the best, Advait. 🌿</div></div>'+journeyHTML();return;
+  }
+  if(selectedISO>EXAM){
+    el.innerHTML='<div class="command-hero"><div class="hero-kicker">Gate one complete</div><div class="hero-title">Prelims is behind you.</div><div class="hero-sub">The system is ready to extend into the Mains campaign.</div></div>'+journeyHTML();return;
+  }
+  const blocks=buildDayBlocks(selectedISO),m=getMonth(selectedISO),wk=getWeek(m,selectedISO);
+  const sun=dow(selectedISO)===0,sat=dow(selectedISO)===6,ticks=store.ticks[selectedISO]||{};
+  const comp=completionFor(selectedISO),toExam=Math.max(0,daysBetween(selectedISO,EXAM));
+  const streak=streakAt(selectedISO),coverage=syllabusScore(),mission=dailyMission(ph,wk,sun);
+  const energy=store.energy[selectedISO]||"normal";
+  el.classList.toggle("is-low",energy==="low");
+  const heavy=blocks.map((b,i)=>({b,i})).filter(x=>x.b.type==="heavy");
+  const practice=blocks.map((b,i)=>({b,i})).find(x=>x.b.type==="practice");
+  const recall=blocks.map((b,i)=>({b,i})).filter(x=>x.b.type==="recall");
+  const essentials=new Set(heavy.slice(0,2).map(x=>x.i));
+  if(practice)essentials.add(practice.i);if(recall.length)essentials.add(recall[recall.length-1].i);
+  const note=store.notes[selectedISO]||"";
+  const phasePct=Math.max(0,Math.min(100,Math.round(daysBetween(ph.start,selectedISO)/Math.max(1,daysBetween(ph.start,ph.end))*100)));
+  el.innerHTML='<div class="command-hero"><div class="hero-top"><div class="hero-copy"><div class="hero-kicker">'+esc(ph.name)+' · '+esc(m.name)+'</div>'+
+    '<div class="hero-title">'+fmtLong(selectedISO)+'</div><div class="hero-sub">'+esc(wk?wk.label:"")+' · Phase '+phasePct+'% elapsed</div></div>'+
+    '<div class="hero-days"><strong>'+toExam+'</strong><span>days to prelims</span></div></div><div class="hero-line"></div>'+
+    '<div class="hero-stats"><div class="hero-stat"><b>'+comp.pct+'%</b><span>today</span></div><div class="hero-stat"><b>'+streak+'</b><span>solid days</span></div><div class="hero-stat"><b>'+coverage+'%</b><span>coverage</span></div></div></div>'+
+    '<div class="mission-card"><div class="mission-row"><div class="mission-index">01</div><div class="mission-copy"><div class="label">The one thing that wins today</div><div class="text">'+esc(mission.title)+'</div><div class="why">'+esc(mission.why)+'</div></div></div></div>'+
+    '<div class="ess-card"><div class="ess-head"><b>The four essentials</b><span>these done = a good day</span></div>'+blocks.map((b,i)=>({b,i})).filter(x=>essentials.has(x.i)).map(x=>'<div class="ess-row '+(ticks[x.i]?'done':'')+'" onclick="toggleBlock('+x.i+')"><span class="ess-time">'+x.b.t+'</span><span class="ess-name">'+esc(x.b.title)+'</span><span class="ess-check">'+CHECK_ICON+'</span></div>').join('')+'</div>'+
+    '<div class="checkin '+(energy==="low"?"is-low":"")+'"><div><div class="checkin-title">What kind of day is this?</div><div class="checkin-sub">The plan adapts \u2014 a lighter day is still a day that counts.</div></div>'+
+    '<div class="energy"><button aria-label="Low energy" class="'+(energy==="low"?"active":"")+'" onclick="setEnergy(\'low\')">◔</button><button aria-label="Normal energy" class="'+(energy==="normal"?"active":"")+'" onclick="setEnergy(\'normal\')">◑</button><button aria-label="High energy" class="'+(energy==="high"?"active":"")+'" onclick="setEnergy(\'high\')">●</button></div>'+
+    '<div class="low-day-note" style="grid-column:1/-1"><b>Minimum viable day:</b> protect the four essential blocks. Anything beyond them is a bonus, not a debt.</div></div>'+
+    '<div class="micro-title"><h2>Today’s field plan</h2><span>'+comp.done+' of '+comp.total+' done \u00b7 essentials first</span></div>'+
+    '<div class="blocks">'+blocks.map((b,i)=>v3BlockHTML(b,i,!!ticks[i],essentials.has(i))).join("")+'</div>'+
+    '<div class="reflection"><div class="reflection-head"><b>Close the loop</b><span>one line is enough</span></div>'+
+    '<textarea id="dailyReflection" placeholder="What moved today? What needs carrying forward?">'+esc(note)+'</textarea>'+
+    '<div class="reflection-foot"><span class="saved-state" id="noteSaved">Saved on this device</span><button class="tiny-btn" onclick="saveDailyNote()">Save reflection</button></div></div>';
+}
+function scoreSparkline(){
+  const vals=store.mocks.map(m=>parseFloat(String(m.score).replace(/[^0-9.]/g,""))).filter(Number.isFinite).slice().reverse();
+  if(vals.length<2)return'<div class="trend-empty">Add two numeric mock scores to reveal the trend.</div>';
+  const min=Math.min(...vals),max=Math.max(...vals),span=max-min||1,w=300,h=76,p=7;
+  const pts=vals.map((v,i)=>((p+i*(w-2*p)/(vals.length-1))+','+(h-p-(v-min)*(h-2*p)/span))).join(" ");
+  return '<svg class="trend" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--signal)" stop-opacity=".25"/><stop offset="1" stop-color="var(--signal)" stop-opacity="0"/></linearGradient></defs><polyline points="'+p+','+(h-p)+' '+pts+' '+(w-p)+','+(h-p)+'" fill="url(#tg)" stroke="none"/><polyline points="'+pts+'" fill="none" stroke="var(--signal)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+function renderProgress(){
+  const el=document.getElementById("view-progress");
+  let end=selectedISO<PLAN_START?PLAN_START:(selectedISO>EXAM?EXAM:selectedISO),days=[];
+  for(let i=13;i>=0;i--){const d=addDays(end,-i),c=completionFor(d);days.push({d,p:c.pct});}
+  const studied=days.filter(x=>x.p>=50).length,avg=Math.round(days.reduce((n,x)=>n+x.p,0)/days.length);
+  const heat=days.map(x=>'<span class="heat '+(x.p>=90?'h4':x.p>=65?'h3':x.p>=35?'h2':x.p>0?'h1':'')+'" title="'+fmtShort(x.d)+' · '+x.p+'%"></span>').join("");
+  const all=SYLLABUS.reduce((a,s)=>a.concat(s.areas),[]),touched=all.filter(a=>(store.syllabus[a.code]||0)>0).length;
+  const bars=SYLLABUS.filter(s=>s.areas.length>1).slice(0,8).map(s=>{
+    const pct=Math.round(s.areas.reduce((n,a)=>n+(store.syllabus[a.code]||0),0)/(s.areas.length*3)*100);
+    const label=s.paper.replace(/^Paper [IVX]+ — /,"").replace(/General Studies Paper /,"GS-").replace(/Sociology Paper /,"Socio P");
+    return '<div class="sbar-row"><span>'+esc(label.slice(0,12))+'</span><span class="sbar-track"><span class="sbar-fill" style="width:'+pct+'%"></span></span><span class="sbar-num">'+pct+'%</span></div>';
+  }).join("");
+  const numeric=store.mocks.map(m=>parseFloat(String(m.score).replace(/[^0-9.]/g,""))).filter(Number.isFinite);
+  const latest=numeric.length?numeric[0]:null,best=numeric.length?Math.max(...numeric):null;
+  const notes=Object.values(store.notes).filter(Boolean).length;
+  const insight=avg>=70?"The rhythm is strong. Guard recovery so consistency remains repeatable.":avg>=40?"Momentum exists; the biggest gain now is finishing fewer, higher-value blocks.":"Start smaller. Four essential blocks repeated will beat heroic restarts.";
+  el.innerHTML='<div class="eyebrow">Evidence, not vibes</div><h1 class="day">Preparation pulse</h1>'+
+    '<div class="dash-grid"><div class="metric"><div class="metric-label">14-day consistency</div><div class="metric-value">'+studied+'<span style="font-size:13px;color:var(--ink-faint)"> / 14</span></div><div class="metric-note">days at 50%+ completion</div></div>'+
+    '<div class="metric"><div class="metric-label">Recent rhythm</div><div class="metric-value">'+streakAt(end)+'</div><div class="metric-note">solid days in a row \u2014 a rest day just pauses it, nothing is lost</div></div>'+
+    '<div class="metric"><div class="metric-label">Self-rated coverage</div><div class="metric-value">'+syllabusScore()+'%</div><div class="metric-note">'+touched+' of '+all.length+' areas touched</div></div>'+
+    '<div class="metric"><div class="metric-label">Reflections</div><div class="metric-value">'+notes+'</div><div class="metric-note">days with a closed loop</div></div>'+
+    '<div class="metric wide"><div class="metric-label">Last 14 days</div><div class="heatmap">'+heat+'</div><div class="heat-labels"><span>'+fmtShort(days[0].d)+'</span><span>'+avg+'% average</span><span>'+fmtShort(end)+'</span></div><div class="insight">'+insight+'</div></div>'+
+    '<div class="metric wide"><div class="metric-label">Coverage by paper</div><div class="subject-bars">'+bars+'</div></div>'+
+    '<div class="metric wide"><div class="metric-label">Mock trajectory</div><div class="metric-note">'+(latest===null?'No numeric scores yet.':'Latest '+latest+' · best '+best)+'</div>'+scoreSparkline()+'</div></div>';
+}
+function exportData(){
+  const payload={app:"Advait MPSC+UPSC 2027 Command Center",version:3,exportedAt:new Date().toISOString(),data:store};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download="advait-dual-2027-backup-"+todayISO()+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function importData(file){
+  if(!file)return;const reader=new FileReader();
+  reader.onload=()=>{try{const payload=JSON.parse(reader.result),next=payload.data||payload;if(!next||typeof next!=="object")throw new Error();
+    if(confirm("Replace the progress on this device with this backup?")){store=next;store.ticks=store.ticks||{};store.review=store.review||{};store.mocks=store.mocks||[];store.syllabus=store.syllabus||{};store.energy=store.energy||{};store.notes=store.notes||{};saveStore(store);renderAll();}}
+    catch(e){alert("That file is not a valid Command Center backup.");}};
+  reader.readAsText(file);
+}
+
+/* ===== navigation & init ===== */
+function setView(v){currentView=v;
+  ["syllabus","today","month","progress","plan"].forEach(n=>{document.getElementById("view-"+n).style.display=n===v?"block":"none";});
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.view===v));
+  window.scrollTo({top:0,behavior:"instant"});}
+function jumpTo(iso){selectedISO=clampISO(iso); document.getElementById("datePick").value=selectedISO; renderAll(); setView("today");}
+function renderAll(){renderToday(); renderMonth(); renderProgress(); renderPlan(); renderSyllabus();}
+document.querySelectorAll(".nav-btn").forEach(b=>b.addEventListener("click",()=>setView(b.dataset.view)));
+document.getElementById("datePick").addEventListener("change",e=>{selectedISO=clampISO(e.target.value); renderAll();});
+document.getElementById("todayBtn").addEventListener("click",()=>{selectedISO=clampISO(todayISO()); document.getElementById("datePick").value=selectedISO; renderAll(); setView("today");});
+document.getElementById("datePick").value=selectedISO;
+renderAll();
+setView("today");
+</script>
+</body>
+</html>
