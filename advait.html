@@ -567,6 +567,7 @@ const MODE_COPY={
   upsc:{label:"UPSC",short:"UPSC",title:"UPSC-only mode",note:"Shows UPSC and shared work; hides MPSC-only add-ons like Marathi passages and Maharashtra-only drills."},
   mpsc:{label:"MPSC",short:"MPSC",title:"MPSC mode",note:"Shows the full Rajyaseva path; removes UPSC optional/Sociology-only blocks so Maharashtra prep stays visible."}
 };
+const MODE_VIEWS=new Set(["today","syllabus","month","progress","intel"]);
 if(!MODE_COPY[examMode]){examMode="both";store.mode=examMode;}
 function modeBanner(){
   const m=MODE_COPY[examMode]||MODE_COPY.both;
@@ -587,6 +588,8 @@ function modeHiddenNote(total,visible){
 }
 function syncModeUI(){
   document.body.dataset.mode=examMode;
+  const row=document.querySelector(".mode-row");
+  if(row){const show=MODE_VIEWS.has(currentView);row.style.display=show?"block":"none";row.setAttribute("aria-hidden",show?"false":"true");}
   document.querySelectorAll("[data-mode-btn]").forEach(b=>{const on=b.dataset.modeBtn===examMode;b.classList.toggle("active",on);b.setAttribute("aria-pressed",on?"true":"false");});
 }
 function setExamMode(mode){
@@ -1280,6 +1283,7 @@ function setView(v){currentView=v;
   ["syllabus","today","month","progress","plan","intel"].forEach(n=>{document.getElementById("view-"+n).style.display=n===v?"block":"none";});
   if(v==="intel"&&window.INTEL)window.INTEL.init();
   document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.view===v));
+  syncModeUI();
   window.scrollTo({top:0,behavior:"instant"});}
 function jumpTo(iso){selectedISO=clampISO(iso); document.getElementById("datePick").value=selectedISO; renderAll(); setView("today");}
 function renderAll(){renderToday(); renderMonth(); renderProgress(); renderPlan(); renderSyllabus();}
