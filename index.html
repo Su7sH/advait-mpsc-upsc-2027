@@ -272,6 +272,12 @@
   .brand{font-family:var(--sans);font-size:14px;font-weight:760;letter-spacing:-.01em;display:flex;align-items:center;gap:9px;}
   .brand::before{content:"A";display:grid;place-items:center;width:27px;height:27px;border-radius:9px;background:var(--signal);color:#fff;font-family:var(--serif);font-size:15px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22);}
   .brand span{color:var(--lime);font-weight:600;}
+  .mode-row{max-width:720px;margin:9px auto 0;}
+  .mode-switch{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;border-radius:13px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);}
+  .mode-switch button{border:0;border-radius:10px;background:transparent;color:#B7C6BC;font-family:var(--sans);font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:8px 6px;cursor:pointer;}
+  .mode-switch button.active{background:var(--lime);color:var(--night);box-shadow:0 4px 12px rgba(0,0,0,.14);}
+  .mode-banner{margin:0 0 14px;padding:10px 12px;border-radius:13px;background:rgba(255,255,255,.7);border:1px solid rgba(39,58,47,.08);font-size:12px;color:var(--ink-soft);}
+  .mode-banner b{color:var(--ink);}
   input[type="date"]{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:#fff;color-scheme:dark;padding-inline:10px;}
   .btn-today{background:var(--lime);color:var(--night);padding-inline:12px;}
   main{padding:20px 16px 34px;}
@@ -386,6 +392,7 @@
 
   @media (max-width:390px){
     .brand span{display:none;}
+    .mode-switch button{font-size:9px;padding-inline:3px;}
     .hero-title{font-size:22px;}
     .hero-days strong{font-size:33px;}
     .hero-stats{gap:5px;}
@@ -426,7 +433,7 @@
   #view-intel .chip.mh.on{background:var(--accent);border-color:var(--accent);}
   #view-intel .count-note{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin:8px 1px;}
   #view-intel .tbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px;}
-  #view-intel .tbl th{position:sticky;top:97px;background:var(--surface);text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);padding:8px 6px;border-bottom:2px solid var(--line);cursor:pointer;white-space:nowrap;z-index:2;}
+  #view-intel .tbl th{position:static;background:var(--surface);text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);padding:8px 6px;border-bottom:2px solid var(--line);cursor:pointer;white-space:nowrap;}
   #view-intel .tbl th.sorted::after{content:" \25BE";color:var(--accent);}
   #view-intel .tbl th.asc.sorted::after{content:" \25B4";color:var(--accent);}
   #view-intel .tbl td{padding:8px 6px;border-bottom:1px solid var(--line-soft);vertical-align:top;}
@@ -465,6 +472,13 @@
       <div class="brand">Advait <span>· MPSC + UPSC 2027</span></div>
       <div class="date-pick"><input type="date" id="datePick" min="2026-06-24" max="2027-05-31"></div>
       <button class="btn-today" id="todayBtn">Today</button>
+    </div>
+    <div class="mode-row">
+      <div class="mode-switch" aria-label="Exam mode">
+        <button data-mode-btn="upsc">UPSC</button>
+        <button data-mode-btn="mpsc">MPSC</button>
+        <button data-mode-btn="both">UPSC + MPSC</button>
+      </div>
     </div>
   </div>
   <main>
@@ -542,8 +556,40 @@ store.mocks=store.mocks||[];
 store.syllabus=store.syllabus||{};
 store.energy=store.energy||{};
 store.notes=store.notes||{};
+store.mode=store.mode||"both";
 
 let currentView="today";
+let examMode=store.mode;
+
+const MODE_COPY={
+  both:{label:"UPSC + MPSC",short:"Integrated",title:"Integrated UPSC + MPSC mode",note:"Study once where the syllabus overlaps, then add the Maharashtra layer separately."},
+  upsc:{label:"UPSC",short:"UPSC",title:"UPSC-only mode",note:"Shows UPSC and shared work; hides MPSC-only add-ons like Marathi passages and Maharashtra-only drills."},
+  mpsc:{label:"MPSC",short:"MPSC",title:"MPSC mode",note:"Shows the full Rajyaseva path; removes UPSC optional/Sociology-only blocks so Maharashtra prep stays visible."}
+};
+if(!MODE_COPY[examMode]){examMode="both";store.mode=examMode;}
+function modeBanner(){
+  const m=MODE_COPY[examMode]||MODE_COPY.both;
+  return '<div class="mode-banner"><b>'+esc(m.title)+':</b> '+esc(m.note)+'</div>';
+}
+function modeStudyTextOK(text){
+  const t=String(text||"");
+  if(examMode==="both")return true;
+  if(examMode==="mpsc")return !/(Sociology|UPSC Optional|UPSC Mains only|UPSC-only|UPSC optional)/i.test(t);
+  return !/(Maharashtra CA|Marathi|MPSC pattern|MPSC Paper II|MPSC-only|state feed)/i.test(t);
+}
+function modeBlockEntries(blocks){
+  return blocks.map((b,i)=>({b,i})).filter(x=>modeStudyTextOK([x.b.title,x.b.sub,x.b.cat].filter(Boolean).join(" ")));
+}
+function syncModeUI(){
+  document.body.dataset.mode=examMode;
+  document.querySelectorAll("[data-mode-btn]").forEach(b=>b.classList.toggle("active",b.dataset.modeBtn===examMode));
+}
+function setExamMode(mode){
+  examMode=MODE_COPY[mode]?mode:"both";
+  store.mode=examMode;saveStore(store);syncModeUI();renderAll();
+  if(currentView==="intel"&&window.INTEL&&window.INTEL.refresh)window.INTEL.refresh();
+}
+window.getExamMode=function(){return examMode;};
 
 /* ===== date helpers ===== */
 function mkDate(iso){const[y,m,d]=iso.split("-").map(Number);return new Date(y,m-1,d,12,0,0);}
@@ -960,7 +1006,7 @@ function journeyHTML(){
 }
 function toggleBlock(i){const t=store.ticks[selectedISO]||(store.ticks[selectedISO]={}); if(t[i])delete t[i]; else t[i]=1; saveStore(store); renderToday();renderProgress();}
 /* ===== render: THIS MONTH ===== */
-function wkRow(tag,val){if(!val)return""; return '<div class="wk-row"><div class="wk-tag">'+esc(tag)+'</div><div class="wk-val">'+esc(val)+'</div></div>';}
+function wkRow(tag,val){if(!val||!modeStudyTextOK(val))return""; return '<div class="wk-row"><div class="wk-tag">'+esc(tag)+'</div><div class="wk-val">'+esc(val)+'</div></div>';}
 function toggleReview(key){if(store.review[key])delete store.review[key]; else store.review[key]=1; saveStore(store); renderMonth();}
 function renderMonth(){
   const el=document.getElementById("view-month"); const m=getMonth(selectedISO);
@@ -981,7 +1027,7 @@ function renderMonth(){
   const reviewHTML=m.review.map((r,i)=>{const key=m.id+"|"+i, done=!!store.review[key];
     return '<div class="check-item '+(done?'done':'')+'" onclick="toggleReview(\''+key+'\')"><div class="ci-box">'+CHECK_ICON+'</div><div class="ci-text">'+esc(r)+'</div></div>';}).join("");
   const rdone=m.review.filter((r,i)=>store.review[m.id+"|"+i]).length;
-  el.innerHTML='<div class="month-head"><div class="mh-main"><div class="eyebrow">Month '+idx+' of 11</div>'+
+  el.innerHTML=modeBanner()+'<div class="month-head"><div class="mh-main"><div class="eyebrow">Month '+idx+' of 11</div>'+
     '<h1 class="day" style="font-size:25px">'+esc(m.name)+'</h1><div class="theme">'+esc(m.theme)+'</div></div>'+
     '<div class="phase-badge" style="background:'+ph.color+'">'+esc(ph.name)+'</div></div>'+
     '<div class="checkpoint"><div class="eyebrow">Checkpoint · '+esc(m.checkpoint.date)+'</div><div class="cp-text">'+esc(m.checkpoint.text)+'</div></div>'+
@@ -1039,9 +1085,19 @@ const STATUS=[{label:"Not started",cls:"st-none"},{label:"Learning",cls:"st-lear
 function cycleStatus(code){const cur=store.syllabus[code]||0; store.syllabus[code]=(cur+1)%4; saveStore(store); renderSyllabus();renderProgress();renderToday();}
 function jumpToMonth(mid){const first=mid+"-01"; selectedISO=clampISO(first<PLAN_START?PLAN_START:first); document.getElementById("datePick").value=selectedISO; renderAll(); setView("month");}
 function grp(sec){if(sec.indexOf("Prelim")>=0)return"Preliminary Examination"; if(sec.indexOf("Main")>=0)return"Main Examination"; if(sec.indexOf("Optional")>=0)return"Optional — Sociology"; return"Personality Test";}
+function syllabusModeOK(s,a){
+  const text=[s.sec,s.paper,s.marks,s.note,a&&a.code,a&&a.name,a&&a.when,a&&a.official&&a.official.join(" ")].filter(Boolean).join(" ");
+  if(examMode==="both")return true;
+  if(examMode==="mpsc")return !/(Optional — Sociology|Sociology Paper|UPSC Optional|UPSC mains optional|UPSC only)/i.test(text);
+  return !/(MPSC only|MPSC-only|Marathi & English comprehension|Maharashtra-only|state importance)/i.test(text);
+}
+function visibleSyllabus(){
+  return SYLLABUS.map(s=>({...s,areas:s.areas.filter(a=>syllabusModeOK(s,a))})).filter(s=>s.areas.length);
+}
 function renderSyllabus(){
   const el=document.getElementById("view-syllabus");
-  const all=SYLLABUS.reduce((a,s)=>a.concat(s.areas),[]);
+  const list=visibleSyllabus();
+  const all=list.reduce((a,s)=>a.concat(s.areas),[]);
   const N=all.length;
   let cC=0,cR=0,cL=0;
   all.forEach(a=>{const st=store.syllabus[a.code]||0; if(st===3)cC++; else if(st===2)cR++; else if(st===1)cL++;});
@@ -1050,10 +1106,12 @@ function renderSyllabus(){
     '<circle cx="32" cy="32" r="23" fill="none" stroke="var(--gov-gold)" stroke-width="1" opacity=".55"/>'+
     '<path d="M32 11 L35 29 L53 32 L35 35 L32 53 L29 35 L11 32 L29 29 Z" fill="var(--gov-gold)"/>'+
     '<path d="M32 20 L33.5 30.5 L44 32 L33.5 33.5 L32 44 L30.5 33.5 L20 32 L30.5 30.5 Z" fill="var(--gov-paper)" opacity=".9"/></svg>';
-  let html='<div class="gz-head">'+seal+'<div class="gz-emblem">UPSC · Civil Services &nbsp;+&nbsp; MPSC · Rajyaseva</div>'+
-    '<div class="gz-title">Combined Official Syllabus<br>UPSC CSE · MPSC Rajyaseva</div>'+
-    '<div class="gz-sub">One syllabus, two exams — faithfully reproduced, annotated with when Advait studies it and where he stands</div>'+
-    '<div class="gz-rule"></div><div class="gz-foot">CSE + Rajyaseva 2027 · Prelims · Mains · Optional (Sociology) · Interview</div></div>';
+  const modeTitle=examMode==="upsc"?"UPSC CSE Syllabus Lens":(examMode==="mpsc"?"MPSC Rajyaseva Syllabus Lens":"Combined Official Syllabus");
+  const modeFoot=examMode==="upsc"?"UPSC CSE 2027 · Prelims · Mains · Optional · Interview":(examMode==="mpsc"?"MPSC Rajyaseva 2027 · Prelims · Mains · Maharashtra layer":"CSE + Rajyaseva 2027 · Prelims · Mains · Optional (Sociology) · Interview");
+  let html=modeBanner()+'<div class="gz-head">'+seal+'<div class="gz-emblem">'+esc(MODE_COPY[examMode].label)+'</div>'+
+    '<div class="gz-title">'+esc(modeTitle)+'<br>2027 Command Center</div>'+
+    '<div class="gz-sub">Mode-filtered coverage, annotated with when Advait studies it and where he stands</div>'+
+    '<div class="gz-rule"></div><div class="gz-foot">'+esc(modeFoot)+'</div></div>';
   const segC=N?cC/N*100:0, segR=N?cR/N*100:0, segL=N?cL/N*100:0;
   html+='<div class="meter"><div class="meter-top"><span class="mt-l">Coverage</span><span class="mt-r">'+touched+' / '+N+' areas touched</span></div>'+
     '<div class="meter-bar"><div class="meter-seg s-confident" style="width:'+segC+'%"></div><div class="meter-seg s-revised" style="width:'+segR+'%"></div><div class="meter-seg s-learning" style="width:'+segL+'%"></div></div>'+
@@ -1064,7 +1122,7 @@ function renderSyllabus(){
     '<span class="lg"><span class="sw" style="background:var(--line-soft)"></span>Not started · '+(N-touched)+'</span>'+
     '</div><div class="syl-sec-note" style="margin-top:10px">Tap any area\'s status chip to advance it: Not started → Learning → Revised → Confident.</div></div>';
   let lastGroup="";
-  SYLLABUS.forEach(s=>{
+  list.forEach(s=>{
     const g=grp(s.sec);
     if(g!==lastGroup){html+='<div class="syl-sec"><div class="syl-sec-hd"><span class="syl-sec-tag">'+esc(g)+'</span></div></div>'; lastGroup=g;}
     let head='<div style="margin-top:14px"><div style="font-weight:700;font-size:13.5px">'+esc(s.paper)+'</div>';
@@ -1094,7 +1152,7 @@ function addDays(iso,n){const d=mkDate(iso);d.setDate(d.getDate()+n);return isoO
 function completionFor(iso){
   const blocks=buildDayBlocks(iso); if(!blocks)return{done:0,total:0,pct:0};
   const ticks=store.ticks[iso]||{}; let done=0,total=0;
-  blocks.forEach((b,i)=>{if(TICKABLE.has(b.type)){total++;if(ticks[i])done++;}});
+  modeBlockEntries(blocks).forEach(({b,i})=>{if(TICKABLE.has(b.type)){total++;if(ticks[i])done++;}});
   return{done,total,pct:total?Math.round(done/total*100):0};
 }
 function streakAt(iso){
@@ -1104,7 +1162,7 @@ function streakAt(iso){
   return n;
 }
 function syllabusScore(){
-  const all=SYLLABUS.reduce((a,s)=>a.concat(s.areas),[]);
+  const all=visibleSyllabus().reduce((a,s)=>a.concat(s.areas),[]);
   const points=all.reduce((n,a)=>n+(store.syllabus[a.code]||0),0);
   return all.length?Math.round(points/(all.length*3)*100):0;
 }
@@ -1134,7 +1192,7 @@ function renderToday(){
   el.classList.toggle("is-low",false);
   if(selectedISO<PLAN_START){
     const dd=daysBetween(selectedISO,PLAN_START);
-    el.innerHTML='<div class="command-hero"><div class="hero-kicker">Runway</div><div class="hero-title">The mission begins 6 July 2026.</div><div class="hero-sub">Set the environment, protect sleep, and arrive hungry—not tired.</div><div class="hero-line"></div><div class="hero-stats"><div class="hero-stat"><b>'+dd+'</b><span>days to launch</span></div><div class="hero-stat"><b>322</b><span>day campaign</span></div><div class="hero-stat"><b>4</b><span>phases</span></div></div></div>'+
+    el.innerHTML=modeBanner()+'<div class="command-hero"><div class="hero-kicker">Runway</div><div class="hero-title">The mission begins 6 July 2026.</div><div class="hero-sub">Set the environment, protect sleep, and arrive hungry—not tired.</div><div class="hero-line"></div><div class="hero-stats"><div class="hero-stat"><b>'+dd+'</b><span>days to launch</span></div><div class="hero-stat"><b>322</b><span>day campaign</span></div><div class="hero-stat"><b>4</b><span>phases</span></div></div></div>'+
       '<button class="pill-btn" onclick="jumpTo(\'2026-07-06\')">Preview Day 1 →</button>'+journeyHTML();return;
   }
   if(selectedISO===EXAM){
@@ -1143,30 +1201,30 @@ function renderToday(){
   if(selectedISO>EXAM){
     el.innerHTML='<div class="command-hero"><div class="hero-kicker">Gate one complete</div><div class="hero-title">Prelims is behind you.</div><div class="hero-sub">The system is ready to extend into the Mains campaign.</div></div>'+journeyHTML();return;
   }
-  const blocks=buildDayBlocks(selectedISO),m=getMonth(selectedISO),wk=getWeek(m,selectedISO);
+  const blocks=buildDayBlocks(selectedISO),blockEntries=modeBlockEntries(blocks),m=getMonth(selectedISO),wk=getWeek(m,selectedISO);
   const sun=dow(selectedISO)===0,sat=dow(selectedISO)===6,ticks=store.ticks[selectedISO]||{};
   const comp=completionFor(selectedISO),toExam=Math.max(0,daysBetween(selectedISO,EXAM));
   const streak=streakAt(selectedISO),coverage=syllabusScore(),mission=dailyMission(ph,wk,sun);
   const energy=store.energy[selectedISO]||"normal";
   el.classList.toggle("is-low",energy==="low");
-  const heavy=blocks.map((b,i)=>({b,i})).filter(x=>x.b.type==="heavy");
-  const practice=blocks.map((b,i)=>({b,i})).find(x=>x.b.type==="practice");
-  const recall=blocks.map((b,i)=>({b,i})).filter(x=>x.b.type==="recall");
+  const heavy=blockEntries.filter(x=>x.b.type==="heavy");
+  const practice=blockEntries.find(x=>x.b.type==="practice");
+  const recall=blockEntries.filter(x=>x.b.type==="recall");
   const essentials=new Set(heavy.slice(0,2).map(x=>x.i));
   if(practice)essentials.add(practice.i);if(recall.length)essentials.add(recall[recall.length-1].i);
   const note=store.notes[selectedISO]||"";
   const phasePct=Math.max(0,Math.min(100,Math.round(daysBetween(ph.start,selectedISO)/Math.max(1,daysBetween(ph.start,ph.end))*100)));
-  el.innerHTML='<div class="command-hero"><div class="hero-top"><div class="hero-copy"><div class="hero-kicker">'+esc(ph.name)+' · '+esc(m.name)+'</div>'+
+  el.innerHTML=modeBanner()+'<div class="command-hero"><div class="hero-top"><div class="hero-copy"><div class="hero-kicker">'+esc(ph.name)+' · '+esc(m.name)+' · '+esc(MODE_COPY[examMode].short)+'</div>'+
     '<div class="hero-title">'+fmtLong(selectedISO)+'</div><div class="hero-sub">'+esc(wk?wk.label:"")+' · Phase '+phasePct+'% elapsed</div></div>'+
     '<div class="hero-days"><strong>'+toExam+'</strong><span>days to prelims</span></div></div><div class="hero-line"></div>'+
     '<div class="hero-stats"><div class="hero-stat"><b>'+comp.pct+'%</b><span>today</span></div><div class="hero-stat"><b>'+streak+'</b><span>solid days</span></div><div class="hero-stat"><b>'+coverage+'%</b><span>coverage</span></div></div></div>'+
     '<div class="mission-card"><div class="mission-row"><div class="mission-index">01</div><div class="mission-copy"><div class="label">The one thing that wins today</div><div class="text">'+esc(mission.title)+'</div><div class="why">'+esc(mission.why)+'</div></div></div></div>'+
-    '<div class="ess-card"><div class="ess-head"><b>The four essentials</b><span>these done = a good day</span></div>'+blocks.map((b,i)=>({b,i})).filter(x=>essentials.has(x.i)).map(x=>'<div class="ess-row '+(ticks[x.i]?'done':'')+'" onclick="toggleBlock('+x.i+')"><span class="ess-time">'+x.b.t+'</span><span class="ess-name">'+esc(x.b.title)+'</span><span class="ess-check">'+CHECK_ICON+'</span></div>').join('')+'</div>'+
+    '<div class="ess-card"><div class="ess-head"><b>The four essentials</b><span>these done = a good day</span></div>'+blockEntries.filter(x=>essentials.has(x.i)).map(x=>'<div class="ess-row '+(ticks[x.i]?'done':'')+'" onclick="toggleBlock('+x.i+')"><span class="ess-time">'+x.b.t+'</span><span class="ess-name">'+esc(x.b.title)+'</span><span class="ess-check">'+CHECK_ICON+'</span></div>').join('')+'</div>'+
     '<div class="checkin '+(energy==="low"?"is-low":"")+'"><div><div class="checkin-title">What kind of day is this?</div><div class="checkin-sub">The plan adapts \u2014 a lighter day is still a day that counts.</div></div>'+
     '<div class="energy"><button aria-label="Low energy" class="'+(energy==="low"?"active":"")+'" onclick="setEnergy(\'low\')">◔</button><button aria-label="Normal energy" class="'+(energy==="normal"?"active":"")+'" onclick="setEnergy(\'normal\')">◑</button><button aria-label="High energy" class="'+(energy==="high"?"active":"")+'" onclick="setEnergy(\'high\')">●</button></div>'+
     '<div class="low-day-note" style="grid-column:1/-1"><b>Minimum viable day:</b> protect the four essential blocks. Anything beyond them is a bonus, not a debt.</div></div>'+
     '<div class="micro-title"><h2>Today’s field plan</h2><span>'+comp.done+' of '+comp.total+' done \u00b7 essentials first</span></div>'+
-    '<div class="blocks">'+blocks.map((b,i)=>v3BlockHTML(b,i,!!ticks[i],essentials.has(i))).join("")+'</div>'+
+    '<div class="blocks">'+blockEntries.map(x=>v3BlockHTML(x.b,x.i,!!ticks[x.i],essentials.has(x.i))).join("")+'</div>'+
     '<div class="reflection"><div class="reflection-head"><b>Close the loop</b><span>one line is enough</span></div>'+
     '<textarea id="dailyReflection" placeholder="What moved today? What needs carrying forward?">'+esc(note)+'</textarea>'+
     '<div class="reflection-foot"><span class="saved-state" id="noteSaved">Saved on this device</span><button class="tiny-btn" onclick="saveDailyNote()">Save reflection</button></div></div>';
@@ -1225,9 +1283,11 @@ function setView(v){currentView=v;
 function jumpTo(iso){selectedISO=clampISO(iso); document.getElementById("datePick").value=selectedISO; renderAll(); setView("today");}
 function renderAll(){renderToday(); renderMonth(); renderProgress(); renderPlan(); renderSyllabus();}
 document.querySelectorAll(".nav-btn").forEach(b=>b.addEventListener("click",()=>setView(b.dataset.view)));
+document.querySelectorAll("[data-mode-btn]").forEach(b=>b.addEventListener("click",()=>setExamMode(b.dataset.modeBtn)));
 document.getElementById("datePick").addEventListener("change",e=>{selectedISO=clampISO(e.target.value); renderAll();});
 document.getElementById("todayBtn").addEventListener("click",()=>{selectedISO=clampISO(todayISO()); document.getElementById("datePick").value=selectedISO; renderAll(); setView("today");});
 document.getElementById("datePick").value=selectedISO;
+syncModeUI();
 renderAll();
 setView("today");
 </script>
@@ -1354,6 +1414,9 @@ const SUBSHORT={"History":"Hist","Geography":"Geo","Polity":"Pol","Economy":"Eco
 const TOTALQ=1202, YEARS_N=12;
 const maxMarks=Math.max(...ROWS.map(r=>r.m));
 ROWS.forEach(r=>{var a=SUBJATTR[r.s];r.dv=a?a.diff:2;r.dl=r.dv>=2.25?'HARD':(r.dv>=1.95?'MED':'EASY');});
+function intelMode(){return window.getExamMode?window.getExamMode():'both';}
+function intelModeLabel(){return intelMode()==='upsc'?'UPSC lens':(intelMode()==='mpsc'?'MPSC lens':'Integrated lens');}
+function rankFocusForMode(){return intelMode()==='upsc'?'shared':'all';}
 
 /* ---------- BRIEF ---------- */
 function cuml(n){let q=0;const s=[...ROWS].sort((a,b)=>b.m-a.m);for(let i=0;i<n&&i<s.length;i++)q+=s[i].c;return q;}
@@ -1403,12 +1466,18 @@ function tierRow(t,label,col){
 }
 
 /* ---------- RANKINGS ---------- */
-let RSTATE={q:'',sub:'',mh:false,ov:'all',tier:'',sort:'m',asc:false,limit:100};
+let RSTATE={q:'',sub:'',mh:false,ov:rankFocusForMode(),tier:'',sort:'m',asc:false,limit:100};
+let RANK_MODE=intelMode();
+function syncRankMode(){
+  const m=intelMode();
+  if(m!==RANK_MODE){RSTATE.ov=rankFocusForMode();RANK_MODE=m;}
+}
 function renderRank(){
+  syncRankMode();
   const el=document.getElementById('iv-rank');
   const subs=[...new Set(ROWS.map(r=>r.s))];
   el.innerHTML=`
-  <div class="eyebrow">Phases 4 · 5 · 11 — master ROI ranking</div>
+  <div class="eyebrow">Phases 4 · 5 · 11 — master ROI ranking · ${intelModeLabel()}</div>
   <h1 class="big">The ranked target list</h1>
   <p class="lede">Every cluster, sortable. Default view: top 100 by marks-potential. Tap any column header to re-sort; search or filter to drill in. Use <b>Exam focus</b> to split <b>Shared&nbsp;w/&nbsp;UPSC</b> (national syllabus, learn once) from <b>MPSC-only</b> (the Maharashtra layer UPSC prep will not give you).</p>
   <div class="controls">
@@ -1783,6 +1852,10 @@ window.INTEL={init:function(){
   if(inited)return; inited=true;
   document.querySelectorAll('#view-intel .intel-nav-btn').forEach(b=>b.onclick=function(){ishow(b.dataset.iv);});
   renderBrief();built.brief=1;
+},refresh:function(){
+  built={};
+  const active=document.querySelector('#view-intel .intel-nav-btn.active');
+  ishow(active?active.dataset.iv:'brief');
 }};
 
 })();
